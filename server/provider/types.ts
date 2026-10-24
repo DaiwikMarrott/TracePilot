@@ -4,6 +4,8 @@ export interface ProviderRequest {
   system: string;
   user: string;
   settings: ModelSettings;
+  /** 1-based attempt number for this case, set by the runner. */
+  attempt?: number;
 }
 
 export interface ProviderCallbacks {

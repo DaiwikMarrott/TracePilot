@@ -93,7 +93,7 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
 
     try {
       const response = await ctx.provider.stream(
-        ctx.request,
+        { ...ctx.request, attempt },
         {
           onText: (text) => {
             if (firstTextAt === null) firstTextAt = ctx.now();

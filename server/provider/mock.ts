@@ -27,7 +27,6 @@ export const abortableSleep: Sleep = (ms, signal) =>
 export class MockProvider implements Provider {
   readonly name = "mock" as const;
   private calls = 0;
-  private readonly attemptsByRequest = new Map<string, number>();
 
   constructor(
     private readonly options: { chunkDelayMs?: number; sleep?: Sleep } = {},
@@ -36,9 +35,7 @@ export class MockProvider implements Provider {
   async stream(request: ProviderRequest, callbacks: ProviderCallbacks, signal: AbortSignal): Promise<ProviderResponse> {
     const sleep = this.options.sleep ?? abortableSleep;
     const scenario = request.settings.mockScenario;
-    const key = request.system + "\u0000" + request.user;
-    const attempt = (this.attemptsByRequest.get(key) ?? 0) + 1;
-    this.attemptsByRequest.set(key, attempt);
+    const attempt = request.attempt ?? 1;
     const call = ++this.calls;
     const requestId = `mock_req_${call.toString().padStart(4, "0")}`;
     const baseDelay = this.options.chunkDelayMs ?? 35;

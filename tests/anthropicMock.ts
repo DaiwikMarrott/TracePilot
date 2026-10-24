@@ -25,6 +25,7 @@ export function sseResponse(script: StreamScript) {
   const encoder = new TextEncoder();
   const model = script.model ?? "claude-opus-5-5";
   const usage = script.usage === undefined ? { input_tokens: 120, output_tokens: 14 } : script.usage;
+  let cancelled = false;
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (type: string, data: unknown) => controller.enqueue(encoder.encode(frame(type, data)));
@@ -47,6 +48,7 @@ export function sseResponse(script: StreamScript) {
           send("content_block_delta", { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: step.text } });
         } else if (step.kind === "pause") {
           await delay(step.ms);
+          if (cancelled) return;
         } else if (step.kind === "error_event") {
           send("error", { type: "error", error: { type: step.type, message: step.message } });
           controller.close();
@@ -64,6 +66,9 @@ export function sseResponse(script: StreamScript) {
       });
       send("message_stop", { type: "message_stop" });
       controller.close();
+    },
+    cancel() {
+      cancelled = true;
     },
   });
   return new HttpResponse(body, {
