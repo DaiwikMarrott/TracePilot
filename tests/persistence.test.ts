@@ -58,7 +58,7 @@ describe("prompt versions", () => {
   it("marks runs abandoned by a previous process as failed", () => {
     const path = tempDbPath();
     const db = openDatabase(path);
-    const repo = new Repository(db);
+    const repo = new Repository(db, undefined, 4242);
     repo.seedPromptVersions(SEED_PROMPTS);
     const run = repo.createRun({
       prompt: repo.getPromptVersion(1)!,
@@ -69,12 +69,27 @@ describe("prompt versions", () => {
     repo.setRunStatus(run.id, "running");
     db.close();
 
-    const reopened = new Repository(openDatabase(path));
+    const reopened = new Repository(openDatabase(path), undefined, 5000, () => false);
     expect(reopened.failAbandonedRuns()).toBe(1);
     const after = reopened.getRunWithCases(run.id)!;
     expect(after.status).toBe("failed");
     expect(after.statusReason).toMatch(/Server stopped/);
     expect(after.summary.unfinished).toBe(2);
+  });
+
+  it("leaves running runs owned by another live process (e.g. the CLI) and queued runs alone", () => {
+    const path = tempDbPath();
+    const cli = new Repository(openDatabase(path), undefined, 4242);
+    cli.seedPromptVersions(SEED_PROMPTS);
+    const input = { prompt: cli.getPromptVersion(1)!, modelSettings: defaultModelSettings(), fixtureSelection: "dev" as const, fixtures: TICKETS.slice(0, 1) };
+    const running = cli.createRun(input);
+    cli.setRunStatus(running.id, "running");
+    const queued = cli.createRun(input);
+
+    const server = new Repository(openDatabase(path), undefined, 5000, (pid) => pid === 4242);
+    expect(server.failAbandonedRuns()).toBe(0);
+    expect(server.getRun(running.id)!.status).toBe("running");
+    expect(server.getRun(queued.id)!.status).toBe("queued");
   });
 });
 

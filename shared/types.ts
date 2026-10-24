@@ -31,7 +31,8 @@ export interface PromptVersion {
   createdAt: string;
 }
 
-export type ProviderName = "mock" | "anthropic";
+export type ProviderName = "mock" | "anthropic" | "google";
+export type LiveProviderName = Exclude<ProviderName, "mock">;
 export const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 export type Effort = (typeof EFFORTS)[number];
 
@@ -161,8 +162,8 @@ export interface RunWithCases extends Run {
 
 export interface HealthResponse {
   ok: true;
-  liveAvailable: boolean;
-  defaultModel: string;
+  /** Which live providers have a key configured on the server, and their default models. */
+  providers: Record<LiveProviderName, { available: boolean; defaultModel: string }>;
   activeRunId: string | null;
 }
 

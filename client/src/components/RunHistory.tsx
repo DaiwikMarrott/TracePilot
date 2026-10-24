@@ -64,7 +64,7 @@ export function RunHistory({ runs, selected, onToggle, onOpen, onCompare }: Prop
                       v{run.promptSnapshot.version} <span className="muted">{run.promptSnapshot.label}</span>
                     </td>
                     <td>
-                      {run.modelSettings.provider === "mock" ? "mock" : run.modelSettings.model}
+                      {run.modelSettings.provider === "mock" ? "mock" : `${run.modelSettings.provider} · ${run.modelSettings.model}`}
                       {run.modelSettings.provider === "mock" && run.modelSettings.mockScenario !== "none" && (
                         <span className="muted"> ({run.modelSettings.mockScenario})</span>
                       )}

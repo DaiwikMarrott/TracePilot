@@ -9,14 +9,17 @@ import { checkAllowedValues, checkRequiredFields } from "./validate";
  * the developer can see whether the labels were right anyway. The case only
  * passes if every check passes.
  */
+const NORMAL_STOPS = new Set(["end_turn", "STOP"]);
+
 export function evaluateResponse(
   response: { text: string; stopReason: string | null },
   expected: Fixture["expected"],
 ): Evaluation {
   const checks: CheckResult[] = [];
   const parsed = parseResponseJson(response.text);
+  // "end_turn" (Claude) and "STOP" (Gemini) are normal completions; anything else may explain a bad parse.
   const stopNote =
-    response.stopReason && response.stopReason !== "end_turn" ? ` (stop_reason: ${response.stopReason})` : "";
+    response.stopReason && !NORMAL_STOPS.has(response.stopReason) ? ` (stop_reason: ${response.stopReason})` : "";
 
   let value: unknown;
   if (parsed.ok) {

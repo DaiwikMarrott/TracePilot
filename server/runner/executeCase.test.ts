@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TICKETS } from "../../fixtures/tickets";
 import { defaultModelSettings } from "../../shared/defaults";
-import type { RunEvent } from "../../shared/types";
+import type { CaseResult, RunEvent } from "../../shared/types";
 import { abortableSleep } from "../provider/mock";
 import { ProviderError, type Provider, type ProviderResponse } from "../provider/types";
 import { executeCase, retryDelay } from "./executeCase";
@@ -48,7 +48,7 @@ function context(provider: Provider, overrides: Partial<ReturnType<typeof defaul
       now: () => Date.now(),
       sleep: abortableSleep,
       emit: (e: RunEvent) => events.push(e),
-      saveProgress: () => {},
+      saveProgress: (_result: CaseResult) => {},
     },
   };
 }
@@ -85,6 +85,10 @@ describe("executeCase", () => {
   it("retries a rate limit before output, honouring retry-after", async () => {
     const provider = scripted(fail("rate_limit", true, 1500), ok(goodJson));
     const { ctx, events } = context(provider);
+    const saved: number[] = [];
+    ctx.saveProgress = (r) => {
+      saved.push(r.attemptLog.length);
+    };
     const result = await drive(executeCase(ctx));
     expect(provider.calls).toBe(2);
     expect(result.status).toBe("completed");
@@ -95,10 +99,14 @@ describe("executeCase", () => {
       { attempt: 2, outcome: "success", requestId: "req_ok" },
     ]);
     expect(events.find((e) => e.type === "case_retry")).toMatchObject({ attempt: 1, errorKind: "rate_limit", delayMs: 1500 });
+    // Saved at start and again before the backoff, with the failed attempt recorded.
+    expect(saved).toEqual([0, 1]);
   });
 
   it("uses bounded exponential backoff and gives up after maxRetries", async () => {
     expect([1, 2, 3, 10].map((a) => retryDelay(a, null))).toEqual([250, 500, 1000, 4000]);
+    expect(retryDelay(1, 53_000)).toBe(53_000);
+    expect(retryDelay(1, 600_000)).toBe(120_000);
     const provider = scripted(fail("overloaded", true), fail("overloaded", true), fail("overloaded", true), ok(goodJson));
     const { ctx } = context(provider, { maxRetries: 2 });
     const result = await drive(executeCase(ctx));
@@ -106,6 +114,16 @@ describe("executeCase", () => {
     expect(result.status).toBe("failed");
     expect(result.error).toEqual({ kind: "overloaded", message: "overloaded happened (gave up after 3 attempts)" });
     expect(result.telemetry.durationMs).toBe(250 + 500);
+  });
+
+  it("does not retry when the server asks for a longer wait than the cap (e.g. a daily quota)", async () => {
+    const provider = scripted(fail("rate_limit", true, 15_453_000), ok(goodJson));
+    const { ctx } = context(provider);
+    const result = await drive(executeCase(ctx));
+    expect(provider.calls).toBe(1);
+    expect(result.status).toBe("failed");
+    expect(result.error!.message).toMatch(/server asked to wait 258 min, longer than the 120 s retry limit; not retried/);
+    expect(result.telemetry.durationMs).toBe(0);
   });
 
   it("does not retry non-retryable errors", async () => {

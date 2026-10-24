@@ -74,7 +74,7 @@ export function CompareView({ a, b, onOpenRun }: { a: string; b: string; onOpenR
               <SummaryCounts summary={run.summary} />
             </div>
             <p className="muted">
-              {run.modelSettings.provider === "mock" ? "mock provider" : run.modelSettings.model} · effort {run.modelSettings.effort} ·{" "}
+              {run.modelSettings.provider === "mock" ? "mock provider" : `${run.modelSettings.provider} · ${run.modelSettings.model}`} · effort {run.modelSettings.effort} ·{" "}
               {new Date(run.createdAt).toLocaleString()}
             </p>
             <button type="button" className="link" onClick={() => onOpenRun(run.id)}>

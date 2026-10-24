@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { defaultModelSettings } from "../../../shared/defaults";
 import { EFFORTS, MOCK_SCENARIOS } from "../../../shared/types";
-import type { Effort, Fixture, FixtureSelection, HealthResponse, MockScenario, ModelSettings, PromptVersion } from "../../../shared/types";
+import type { Effort, Fixture, FixtureSelection, HealthResponse, MockScenario, ModelSettings, PromptVersion, ProviderName } from "../../../shared/types";
 import { api, errorMessage } from "../api";
 import { useRunStream } from "../hooks/useRunStream";
 import { RunStatusBadge, SummaryCounts } from "./badges";
 import { CaseCard } from "./CaseCard";
 
 const SCENARIO_LABEL: Record<MockScenario, string> = {
-  none: "None — normal responses",
+  none: "None",
   slow: "Slow stream (to try Stop)",
   rate_limit_once: "Rate limit on first attempt",
   interrupt_stream: "Interrupt every other stream",
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function RunPanel({ health, prompt, fixtures, onRunFinished, onOpenRun }: Props) {
-  const [settings, setSettings] = useState<ModelSettings>(() => defaultModelSettings(health?.defaultModel));
+  const [settings, setSettings] = useState<ModelSettings>(() => defaultModelSettings(health?.providers.anthropic.defaultModel));
   const [selection, setSelection] = useState<FixtureSelection>("dev");
   const [runId, setRunId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +38,13 @@ export function RunPanel({ health, prompt, fixtures, onRunFinished, onOpenRun }:
   const run = live.run;
   const inProgress = run !== null && (run.status === "queued" || run.status === "running");
   const set = <K extends keyof ModelSettings>(key: K, value: ModelSettings[K]) => setSettings((s) => ({ ...s, [key]: value }));
+  // Each live provider has its own default model; switching resets the model field to it.
+  const chooseProvider = (provider: ProviderName) =>
+    setSettings((s) => ({
+      ...s,
+      provider,
+      model: provider === "mock" || !health ? s.model : health.providers[provider].defaultModel,
+    }));
   const fixtureById = new Map(fixtures.map((f) => [f.id, f]));
   const done = run ? run.cases.filter((c) => c.status !== "queued" && c.status !== "running").length : 0;
 
@@ -73,10 +80,13 @@ export function RunPanel({ health, prompt, fixtures, onRunFinished, onOpenRun }:
           <legend className="visually-hidden">Model settings</legend>
           <label className="field">
             <span>Provider</span>
-            <select value={settings.provider} onChange={(e) => set("provider", e.target.value as ModelSettings["provider"])}>
+            <select value={settings.provider} onChange={(e) => chooseProvider(e.target.value as ProviderName)}>
               <option value="mock">Mock (no API key)</option>
-              <option value="anthropic" disabled={!health?.liveAvailable}>
-                Claude API{health?.liveAvailable ? "" : " — set ANTHROPIC_API_KEY"}
+              <option value="anthropic" disabled={!health?.providers.anthropic.available}>
+                Claude API{health?.providers.anthropic.available ? "" : " — set ANTHROPIC_API_KEY"}
+              </option>
+              <option value="google" disabled={!health?.providers.google.available}>
+                Gemini API (dev stand-in){health?.providers.google.available ? "" : " — set GEMINI_API_KEY"}
               </option>
             </select>
           </label>
@@ -106,7 +116,7 @@ export function RunPanel({ health, prompt, fixtures, onRunFinished, onOpenRun }:
             </label>
           )}
           <label className="field">
-            <span>Effort</span>
+            <span>Effort / thinking level</span>
             <select value={settings.effort} onChange={(e) => set("effort", e.target.value as Effort)}>
               {EFFORTS.map((x) => (
                 <option key={x}>{x}</option>

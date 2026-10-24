@@ -20,7 +20,7 @@ export function CaseCard({ result, fixture, headingLevel = 3, title }: Props) {
           {title ?? result.fixtureId}
           {fixture && <span className="muted"> · {fixture.ticket.subject}</span>}
         </Heading>
-        <OutcomeBadge outcome={outcome} interrupted={result.interrupted} />
+        <OutcomeBadge outcome={outcome} interrupted={result.interrupted} running={result.status === "running"} />
       </div>
       {fixture && (
         <p className="muted">

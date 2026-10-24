@@ -70,11 +70,15 @@ export function RunDetails({ id }: { id: string }) {
               v{run.promptSnapshot.version} (version id {run.promptVersionId})
             </dd>
             <dt>Provider</dt>
-            <dd>{s.provider === "mock" ? `mock (scenario: ${s.mockScenario})` : "Claude API"}</dd>
-            {s.provider === "anthropic" && (
+            <dd>{s.provider === "mock" ? `mock (scenario: ${s.mockScenario})` : s.provider === "anthropic" ? "Claude API" : "Gemini API"}</dd>
+            {s.provider !== "mock" && (
               <>
                 <dt>Model</dt>
                 <dd className="mono">{s.model}</dd>
+              </>
+            )}
+            {s.provider === "anthropic" && (
+              <>
                 <dt>Refusal fallback</dt>
                 <dd>{s.refusalFallback ? "on" : "off"}</dd>
               </>
@@ -185,9 +189,10 @@ export function RunDetails({ id }: { id: string }) {
                 </ol>
               </details>
             )}
-            {c.telemetry.servedModel && s.provider === "anthropic" && c.telemetry.servedModel !== s.model && (
+            {c.telemetry.servedModel && s.provider !== "mock" && c.telemetry.servedModel !== s.model && (
               <p className="notice">
-                Served by {c.telemetry.servedModel} instead of {s.model} (server-side fallback).
+                Served by {c.telemetry.servedModel} instead of {s.model}
+                {s.provider === "anthropic" ? " (server-side fallback)" : " (provider alias)"}.
               </p>
             )}
           </li>

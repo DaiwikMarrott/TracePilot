@@ -14,10 +14,23 @@ const OUTCOME_LABEL: Record<CaseOutcome, string> = {
   unfinished: "unfinished",
 };
 
-export function OutcomeBadge({ outcome, interrupted }: { outcome: CaseOutcome; interrupted?: boolean }) {
+export function OutcomeBadge({
+  outcome,
+  interrupted,
+  running,
+}: {
+  outcome: CaseOutcome;
+  interrupted?: boolean;
+  /** A case in progress is "unfinished" for scoring but should read as running while you watch it. */
+  running?: boolean;
+}) {
   return (
     <span className="badge-group">
-      <span className={`badge badge-${outcome}`}>{OUTCOME_LABEL[outcome]}</span>
+      {running ? (
+        <span className="badge badge-running">running</span>
+      ) : (
+        <span className={`badge badge-${outcome}`}>{OUTCOME_LABEL[outcome]}</span>
+      )}
       {interrupted && <span className="badge badge-interrupted">interrupted</span>}
     </span>
   );

@@ -1,0 +1,712 @@
+{
+  "provider": "google",
+  "settings": {
+    "provider": "google",
+    "model": "gemini-3-flash-preview",
+    "maxTokens": 4096,
+    "effort": "low",
+    "timeoutMs": 30000,
+    "maxRetries": 2,
+    "refusalFallback": true,
+    "mockScenario": "none"
+  },
+  "selection": "holdout",
+  "repeat": 1,
+  "runs": [
+    {
+      "id": "e3954b18-969d-4520-84dc-703189310279",
+      "promptVersionId": 1,
+      "promptSnapshot": {
+        "version": 1,
+        "label": "Baseline",
+        "systemPrompt": "You are a support ticket triage assistant.\nClassify the ticket into one of these categories: billing, account_access, technical_support, general_inquiry.\nAlso give an urgency of low, medium, or high.\nReturn JSON with the fields category and urgency.",
+        "userTemplate": "Subject: {{subject}}\n\n{{body}}"
+      },
+      "modelSettings": {
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
+        "maxTokens": 4096,
+        "effort": "low",
+        "timeoutMs": 30000,
+        "maxRetries": 2,
+        "refusalFallback": true,
+        "mockScenario": "none"
+      },
+      "fixtureSelection": "holdout",
+      "fixtureSnapshot": [
+        {
+          "id": "T09",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Former employee still has admin access",
+            "body": "A contractor we let go this morning can still log in as an admin on our workspace. I don't see how to remove them. Please help urgently."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T10",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Card declined on renewal, account suspended",
+            "body": "Our annual renewal failed because the card expired, and now the whole team is locked out of the dashboard. I've updated the card but it's still suspended."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T11",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Dark mode toggle doesn't persist",
+            "body": "Every time I reload the page dark mode switches back to light. Minor annoyance, not urgent."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T12",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Partnership question",
+            "body": "I run a consultancy and would like to know if you have a reseller or referral partner program."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        }
+      ],
+      "fixtureHash": "da56ddb112e53fb0",
+      "status": "completed",
+      "statusReason": null,
+      "createdAt": "2026-10-24T02:45:13.923Z",
+      "startedAt": "2026-10-24T02:45:13.925Z",
+      "finishedAt": "2026-10-24T02:45:19.768Z",
+      "summary": {
+        "total": 4,
+        "passed": 0,
+        "failed": 4,
+        "errored": 0,
+        "cancelled": 0,
+        "unfinished": 0
+      },
+      "cases": [
+        {
+          "runId": "e3954b18-969d-4520-84dc-703189310279",
+          "index": 0,
+          "fixtureId": "T09",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"account_access\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:13.926Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1616,
+            "durationMs": 1713,
+            "inputTokens": 100,
+            "outputTokens": 214,
+            "requestId": null,
+            "messageId": "uhvcaqniCNrpz7IP_7S_gQk",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:13.926Z",
+          "finishedAt": "2026-10-24T02:45:15.639Z"
+        },
+        {
+          "runId": "e3954b18-969d-4520-84dc-703189310279",
+          "index": 1,
+          "fixtureId": "T10",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"billing\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:15.639Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2082,
+            "durationMs": 2166,
+            "inputTokens": 103,
+            "outputTokens": 321,
+            "requestId": null,
+            "messageId": "uxvcao6WMo3xqtsP2oHJiAs",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:15.639Z",
+          "finishedAt": "2026-10-24T02:45:17.805Z"
+        },
+        {
+          "runId": "e3954b18-969d-4520-84dc-703189310279",
+          "index": 2,
+          "fixtureId": "T11",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"technical_support\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:17.806Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 864,
+            "durationMs": 1050,
+            "inputTokens": 88,
+            "outputTokens": 27,
+            "requestId": null,
+            "messageId": "vRvcapn5OeOtz7IPpejd-QM",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:17.806Z",
+          "finishedAt": "2026-10-24T02:45:18.856Z"
+        },
+        {
+          "runId": "e3954b18-969d-4520-84dc-703189310279",
+          "index": 3,
+          "fixtureId": "T12",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"general_inquiry\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"general_inquiry\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "general_inquiry",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:18.857Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 856,
+            "durationMs": 911,
+            "inputTokens": 83,
+            "outputTokens": 28,
+            "requestId": null,
+            "messageId": "vxvcatY9ipjp2Q_u--eQCw",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:18.857Z",
+          "finishedAt": "2026-10-24T02:45:19.768Z"
+        }
+      ]
+    },
+    {
+      "id": "98ae394d-5e9c-4de8-a70f-5ab84a9aa7b5",
+      "promptVersionId": 2,
+      "promptSnapshot": {
+        "version": 2,
+        "label": "Strict JSON + urgency rubric",
+        "systemPrompt": "You are a support ticket triage assistant. Your output is parsed by a program, so respond with only a single JSON object and no other text: no prose, no markdown code fences.\n\nThe object must be exactly: {\"category\": <category>, \"urgency\": <urgency>}\n\nCategories:\n- billing: charges, refunds, invoices, pricing, discounts, failed payments.\n- account_access: sign-in, passwords, two-factor authentication, user permissions.\n- technical_support: product bugs, errors, outages, broken features.\n- general_inquiry: anything else, such as company information or partnerships.\n\nUrgency guidelines:\n- high: the customer is blocked right now (cannot sign in, service down, account suspended) or there is a security risk.\n- medium: something is broken or wrong but there is a workaround or no immediate deadline.\n- low: questions, minor annoyances, or requests with a distant deadline.\n\nWhen a ticket touches several areas, choose the category of the root cause.",
+        "userTemplate": "Classify this support ticket.\n\n<ticket>\nSubject: {{subject}}\n\n{{body}}\n</ticket>"
+      },
+      "modelSettings": {
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
+        "maxTokens": 4096,
+        "effort": "low",
+        "timeoutMs": 30000,
+        "maxRetries": 2,
+        "refusalFallback": true,
+        "mockScenario": "none"
+      },
+      "fixtureSelection": "holdout",
+      "fixtureSnapshot": [
+        {
+          "id": "T09",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Former employee still has admin access",
+            "body": "A contractor we let go this morning can still log in as an admin on our workspace. I don't see how to remove them. Please help urgently."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T10",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Card declined on renewal, account suspended",
+            "body": "Our annual renewal failed because the card expired, and now the whole team is locked out of the dashboard. I've updated the card but it's still suspended."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T11",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Dark mode toggle doesn't persist",
+            "body": "Every time I reload the page dark mode switches back to light. Minor annoyance, not urgent."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T12",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Partnership question",
+            "body": "I run a consultancy and would like to know if you have a reseller or referral partner program."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        }
+      ],
+      "fixtureHash": "da56ddb112e53fb0",
+      "status": "completed",
+      "statusReason": null,
+      "createdAt": "2026-10-24T02:45:19.770Z",
+      "startedAt": "2026-10-24T02:45:19.770Z",
+      "finishedAt": "2026-10-24T02:46:01.968Z",
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "errored": 0,
+        "cancelled": 0,
+        "unfinished": 0
+      },
+      "cases": [
+        {
+          "runId": "98ae394d-5e9c-4de8-a70f-5ab84a9aa7b5",
+          "index": 0,
+          "fixtureId": "T09",
+          "status": "completed",
+          "output": "{\"category\": \"account_access\", \"urgency\": \"high\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\"."
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:19.770Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1851,
+            "durationMs": 1872,
+            "inputTokens": 274,
+            "outputTokens": 264,
+            "requestId": null,
+            "messageId": "vxvcase0N-7rz7IPheeakAk",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:19.770Z",
+          "finishedAt": "2026-10-24T02:45:21.642Z"
+        },
+        {
+          "runId": "98ae394d-5e9c-4de8-a70f-5ab84a9aa7b5",
+          "index": 1,
+          "fixtureId": "T10",
+          "status": "completed",
+          "output": "{\"category\": \"billing\", \"urgency\": \"high\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\"."
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:21.643Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1632,
+            "durationMs": 1689,
+            "inputTokens": 277,
+            "outputTokens": 261,
+            "requestId": null,
+            "messageId": "wRvcaoXHMLLyqtsPv7-LgAw",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:45:21.643Z",
+          "finishedAt": "2026-10-24T02:45:23.332Z"
+        },
+        {
+          "runId": "98ae394d-5e9c-4de8-a70f-5ab84a9aa7b5",
+          "index": 2,
+          "fixtureId": "T11",
+          "status": "completed",
+          "output": "{\"category\": \"technical_support\", \"urgency\": \"low\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\"."
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:45:23.333Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-3-flash, description: Generate content requests per minute limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 36000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:45:59.450Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1616,
+            "durationMs": 37755,
+            "inputTokens": 262,
+            "outputTokens": 195,
+            "requestId": null,
+            "messageId": "5xvcav25JvzmqtsPm5akuQk",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 2
+          },
+          "startedAt": "2026-10-24T02:45:23.333Z",
+          "finishedAt": "2026-10-24T02:46:01.088Z"
+        },
+        {
+          "runId": "98ae394d-5e9c-4de8-a70f-5ab84a9aa7b5",
+          "index": 3,
+          "fixtureId": "T12",
+          "status": "completed",
+          "output": "{\"category\": \"general_inquiry\", \"urgency\": \"low\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"general_inquiry\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\"."
+              }
+            ],
+            "predicted": {
+              "category": "general_inquiry",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:46:01.089Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 780,
+            "durationMs": 879,
+            "inputTokens": 257,
+            "outputTokens": 16,
+            "requestId": null,
+            "messageId": "6RvcauOnEL3Vz7IPouiHoAk",
+            "servedModel": "gemini-3-flash-preview",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:46:01.089Z",
+          "finishedAt": "2026-10-24T02:46:01.968Z"
+        }
+      ]
+    }
+  ]
+}

@@ -32,6 +32,18 @@ export function App() {
       .catch((err) => setLoadError(`The API server is not reachable (${errorMessage(err)}). Start it with npm run dev.`));
   }, []);
 
+  // Runs can also be started from the CLI or another tab: refresh history when it is
+  // opened, and keep polling while any listed run is still in progress.
+  const viewingHistory = route.view === "history";
+  const anyInProgress = runs.some((r) => r.status === "queued" || r.status === "running");
+  useEffect(() => {
+    if (!viewingHistory) return;
+    void refreshRuns().catch(() => {});
+    if (!anyInProgress) return;
+    const timer = setInterval(() => void refreshRuns().catch(() => {}), 3000);
+    return () => clearInterval(timer);
+  }, [viewingHistory, anyInProgress, refreshRuns]);
+
   async function savePrompt(input: CreatePromptVersionRequest) {
     const created = await api.createPrompt(input);
     setVersions((vs) => [...vs, created]);
@@ -45,7 +57,7 @@ export function App() {
         <p role="status" className="muted">
           {loadError ??
             (health
-              ? `Server online · live mode ${health.liveAvailable ? `available (${health.defaultModel})` : "unavailable — mock only"}`
+              ? `Server online · providers: mock${health.providers.anthropic.available ? `, Claude (${health.providers.anthropic.defaultModel})` : ""}${health.providers.google.available ? `, Gemini (${health.providers.google.defaultModel})` : ""}`
               : "Connecting…")}
         </p>
       </header>

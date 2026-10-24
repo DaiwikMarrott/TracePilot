@@ -3,8 +3,7 @@ import { createApp } from "./app";
 import { loadConfig } from "./config";
 import { openDatabase } from "./db/database";
 import { Repository } from "./db/repository";
-import { ClaudeProvider } from "./provider/claude";
-import { MockProvider } from "./provider/mock";
+import { buildProviders } from "./providers";
 import { RunManager } from "./runner/runManager";
 
 const config = loadConfig();
@@ -15,14 +14,15 @@ if (abandoned > 0) console.warn(`Marked ${abandoned} unfinished run(s) from a pr
 
 const manager = new RunManager({
   repo,
-  providers: {
-    mock: new MockProvider(),
-    ...(config.apiKey ? { anthropic: new ClaudeProvider({ apiKey: config.apiKey }) } : {}),
-  },
+  providers: buildProviders(config),
 });
 
 const app = createApp({ config, repo, manager });
 app.listen(config.port, () => {
-  const mode = config.apiKey ? `live (${config.defaultModel}) and mock` : "mock only (no ANTHROPIC_API_KEY)";
+  const live = [
+    config.apiKey && `Claude (${config.defaultModel})`,
+    config.googleApiKey && `Gemini (${config.googleModel})`,
+  ].filter(Boolean);
+  const mode = live.length ? `mock, ${live.join(", ")}` : "mock only (no ANTHROPIC_API_KEY or GEMINI_API_KEY)";
   console.log(`TracePilot API listening on http://localhost:${config.port} — providers: ${mode}`);
 });

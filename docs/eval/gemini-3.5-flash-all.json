@@ -1,0 +1,1656 @@
+{
+  "provider": "google",
+  "note": "Exported from the workspace database; the v2 run was cut short by the free-tier daily quota.",
+  "runs": [
+    {
+      "id": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+      "promptVersionId": 1,
+      "promptSnapshot": {
+        "version": 1,
+        "label": "Baseline",
+        "systemPrompt": "You are a support ticket triage assistant.\nClassify the ticket into one of these categories: billing, account_access, technical_support, general_inquiry.\nAlso give an urgency of low, medium, or high.\nReturn JSON with the fields category and urgency.",
+        "userTemplate": "Subject: {{subject}}\n\n{{body}}"
+      },
+      "modelSettings": {
+        "provider": "google",
+        "model": "gemini-3.5-flash",
+        "maxTokens": 4096,
+        "effort": "low",
+        "timeoutMs": 30000,
+        "maxRetries": 2,
+        "refusalFallback": true,
+        "mockScenario": "none"
+      },
+      "fixtureSelection": "all",
+      "fixtureSnapshot": [
+        {
+          "id": "T01",
+          "split": "dev",
+          "ticket": {
+            "subject": "Charged twice for March",
+            "body": "My card statement shows two charges of $49 for the Pro plan on March 3rd. I only have one workspace. Please refund the duplicate."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T02",
+          "split": "dev",
+          "ticket": {
+            "subject": "Locked out after enabling 2FA",
+            "body": "I turned on two-factor authentication yesterday and lost my phone. Now I can't sign in at all and I have a client demo in two hours."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T03",
+          "split": "dev",
+          "ticket": {
+            "subject": "Export to CSV produces empty file",
+            "body": "When I export the Reports table to CSV the download completes but the file only has the header row. This started after Tuesday's update. Not blocking us yet, we copy-paste for now."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T04",
+          "split": "dev",
+          "ticket": {
+            "subject": "Do you have a nonprofit discount?",
+            "body": "We're a small food bank evaluating your product for next year. Is there a nonprofit or education discount?"
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T05",
+          "split": "dev",
+          "ticket": {
+            "subject": "API returning 500 for every request — production down",
+            "body": "Since 09:40 UTC every call to /v2/orders returns HTTP 500. Our checkout is completely down for all customers."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T06",
+          "split": "dev",
+          "ticket": {
+            "subject": "Where can I find your office hours?",
+            "body": "Hi, just curious what time zone your support team works in and whether you're open on weekends."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T07",
+          "split": "dev",
+          "ticket": {
+            "subject": "Password reset email never arrives",
+            "body": "I've requested a password reset three times today and nothing shows up, not even in spam. I can still use the mobile app since I'm logged in there."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T08",
+          "split": "dev",
+          "ticket": {
+            "subject": "Invoice shows wrong company name",
+            "body": "Our invoices still list our old company name. Finance needs corrected invoices before our audit at the end of the quarter, about six weeks away."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T09",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Former employee still has admin access",
+            "body": "A contractor we let go this morning can still log in as an admin on our workspace. I don't see how to remove them. Please help urgently."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T10",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Card declined on renewal, account suspended",
+            "body": "Our annual renewal failed because the card expired, and now the whole team is locked out of the dashboard. I've updated the card but it's still suspended."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T11",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Dark mode toggle doesn't persist",
+            "body": "Every time I reload the page dark mode switches back to light. Minor annoyance, not urgent."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T12",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Partnership question",
+            "body": "I run a consultancy and would like to know if you have a reseller or referral partner program."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        }
+      ],
+      "fixtureHash": "39e2541f412ca1e6",
+      "status": "completed",
+      "statusReason": null,
+      "createdAt": "2026-10-24T02:27:40.150Z",
+      "startedAt": "2026-10-24T02:27:40.153Z",
+      "finishedAt": "2026-10-24T02:29:09.806Z",
+      "summary": {
+        "total": 12,
+        "passed": 0,
+        "failed": 12,
+        "errored": 0,
+        "cancelled": 0,
+        "unfinished": 0
+      },
+      "cases": [
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 0,
+          "fixtureId": "T01",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"billing\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "failed",
+                "detail": "Predicted \"high\", expected \"medium\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:40.157Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2894,
+            "durationMs": 3117,
+            "inputTokens": 97,
+            "outputTokens": 308,
+            "requestId": null,
+            "messageId": "nBfcavGSGLLyqtsPv7-LgAw",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:40.156Z",
+          "finishedAt": "2026-10-24T02:27:43.273Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 1,
+          "fixtureId": "T02",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"account_access\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:43.286Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 748,
+            "durationMs": 846,
+            "inputTokens": 101,
+            "outputTokens": 64,
+            "requestId": null,
+            "messageId": "nxfcaqKBHN2RmtkP6d-L-Qo",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:43.285Z",
+          "finishedAt": "2026-10-24T02:27:44.131Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 2,
+          "fixtureId": "T03",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"technical_support\",\n  \"urgency\": \"medium\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"medium\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "medium"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:44.132Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2771,
+            "durationMs": 2772,
+            "inputTokens": 108,
+            "outputTokens": 260,
+            "requestId": null,
+            "messageId": "oBfcaojCD5qj6dkPr-vMqQg",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:44.132Z",
+          "finishedAt": "2026-10-24T02:27:46.904Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 3,
+          "fixtureId": "T04",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"billing\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:46.905Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1058,
+            "durationMs": 1138,
+            "inputTokens": 91,
+            "outputTokens": 25,
+            "requestId": null,
+            "messageId": "oxfcapHJAeeY6dkPuqCMwQQ",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:46.905Z",
+          "finishedAt": "2026-10-24T02:27:48.043Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 4,
+          "fixtureId": "T05",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"technical_support\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:48.045Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1523,
+            "durationMs": 1562,
+            "inputTokens": 106,
+            "outputTokens": 188,
+            "requestId": null,
+            "messageId": "pBfcauXNCpnAqtsPxt2HkAk",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:48.045Z",
+          "finishedAt": "2026-10-24T02:27:49.607Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 5,
+          "fixtureId": "T06",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"general_inquiry\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"general_inquiry\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "general_inquiry",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:49.607Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 789,
+            "durationMs": 912,
+            "inputTokens": 91,
+            "outputTokens": 28,
+            "requestId": null,
+            "messageId": "pRfcav2WLKSY6dkPmbLSyQM",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:27:49.607Z",
+          "finishedAt": "2026-10-24T02:27:50.519Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 6,
+          "fixtureId": "T07",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"account_access\",\n  \"urgency\": \"medium\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"medium\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "medium"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:27:50.520Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-3.6-flash, description: Generate content requests per minute limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/ra",
+              "requestId": null,
+              "retryDelayMs": 9000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:27:59.659Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2419,
+            "durationMs": 11559,
+            "inputTokens": 102,
+            "outputTokens": 92,
+            "requestId": null,
+            "messageId": "rxfcavGrM6Ke6dkPnfmC6Qo",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 2
+          },
+          "startedAt": "2026-10-24T02:27:50.520Z",
+          "finishedAt": "2026-10-24T02:28:02.079Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 7,
+          "fixtureId": "T08",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"billing\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:28:02.082Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-3.6-flash, description: Generate content requests per minute limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/ra",
+              "requestId": null,
+              "retryDelayMs": 57000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:28:59.455Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2757,
+            "durationMs": 60151,
+            "inputTokens": 95,
+            "outputTokens": 307,
+            "requestId": null,
+            "messageId": "6xfcatGfKpeV_uMP1KTX4QE",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 2
+          },
+          "startedAt": "2026-10-24T02:28:02.081Z",
+          "finishedAt": "2026-10-24T02:29:02.232Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 8,
+          "fixtureId": "T09",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"account_access\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:02.239Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1610,
+            "durationMs": 1736,
+            "inputTokens": 100,
+            "outputTokens": 227,
+            "requestId": null,
+            "messageId": "7hfcapCPHba4qtsPqc2WwQk",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:02.239Z",
+          "finishedAt": "2026-10-24T02:29:03.975Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 9,
+          "fixtureId": "T10",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"billing\",\n  \"urgency\": \"high\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:03.976Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 2176,
+            "durationMs": 2259,
+            "inputTokens": 103,
+            "outputTokens": 303,
+            "requestId": null,
+            "messageId": "8BfcaoDkB9Gk_uMP16HQ2AI",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:03.975Z",
+          "finishedAt": "2026-10-24T02:29:06.234Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 10,
+          "fixtureId": "T11",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"technical_support\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:06.235Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1830,
+            "durationMs": 1941,
+            "inputTokens": 88,
+            "outputTokens": 202,
+            "requestId": null,
+            "messageId": "8hfcao6DFc6UmtkP7PrKuAk",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:06.235Z",
+          "finishedAt": "2026-10-24T02:29:08.176Z"
+        },
+        {
+          "runId": "32f7f175-3cb8-4f36-90f1-6e939c0c5ff2",
+          "index": 11,
+          "fixtureId": "T12",
+          "status": "completed",
+          "output": "```json\n{\n  \"category\": \"general_inquiry\",\n  \"urgency\": \"low\"\n}\n```",
+          "interrupted": false,
+          "evaluation": {
+            "passed": false,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "failed",
+                "detail": "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings. (checked against the recovered object)"
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets. (checked against the recovered object)"
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"general_inquiry\". (checked against the recovered object)"
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"low\". (checked against the recovered object)"
+              }
+            ],
+            "predicted": {
+              "category": "general_inquiry",
+              "urgency": "low"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:08.177Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1566,
+            "durationMs": 1627,
+            "inputTokens": 83,
+            "outputTokens": 195,
+            "requestId": null,
+            "messageId": "9Bfcar3JFLaj_uMPqObbuAI",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:08.176Z",
+          "finishedAt": "2026-10-24T02:29:09.803Z"
+        }
+      ]
+    },
+    {
+      "id": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+      "promptVersionId": 2,
+      "promptSnapshot": {
+        "version": 2,
+        "label": "Strict JSON + urgency rubric",
+        "systemPrompt": "You are a support ticket triage assistant. Your output is parsed by a program, so respond with only a single JSON object and no other text: no prose, no markdown code fences.\n\nThe object must be exactly: {\"category\": <category>, \"urgency\": <urgency>}\n\nCategories:\n- billing: charges, refunds, invoices, pricing, discounts, failed payments.\n- account_access: sign-in, passwords, two-factor authentication, user permissions.\n- technical_support: product bugs, errors, outages, broken features.\n- general_inquiry: anything else, such as company information or partnerships.\n\nUrgency guidelines:\n- high: the customer is blocked right now (cannot sign in, service down, account suspended) or there is a security risk.\n- medium: something is broken or wrong but there is a workaround or no immediate deadline.\n- low: questions, minor annoyances, or requests with a distant deadline.\n\nWhen a ticket touches several areas, choose the category of the root cause.",
+        "userTemplate": "Classify this support ticket.\n\n<ticket>\nSubject: {{subject}}\n\n{{body}}\n</ticket>"
+      },
+      "modelSettings": {
+        "provider": "google",
+        "model": "gemini-3.5-flash",
+        "maxTokens": 4096,
+        "effort": "low",
+        "timeoutMs": 30000,
+        "maxRetries": 2,
+        "refusalFallback": true,
+        "mockScenario": "none"
+      },
+      "fixtureSelection": "all",
+      "fixtureSnapshot": [
+        {
+          "id": "T01",
+          "split": "dev",
+          "ticket": {
+            "subject": "Charged twice for March",
+            "body": "My card statement shows two charges of $49 for the Pro plan on March 3rd. I only have one workspace. Please refund the duplicate."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T02",
+          "split": "dev",
+          "ticket": {
+            "subject": "Locked out after enabling 2FA",
+            "body": "I turned on two-factor authentication yesterday and lost my phone. Now I can't sign in at all and I have a client demo in two hours."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T03",
+          "split": "dev",
+          "ticket": {
+            "subject": "Export to CSV produces empty file",
+            "body": "When I export the Reports table to CSV the download completes but the file only has the header row. This started after Tuesday's update. Not blocking us yet, we copy-paste for now."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T04",
+          "split": "dev",
+          "ticket": {
+            "subject": "Do you have a nonprofit discount?",
+            "body": "We're a small food bank evaluating your product for next year. Is there a nonprofit or education discount?"
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T05",
+          "split": "dev",
+          "ticket": {
+            "subject": "API returning 500 for every request — production down",
+            "body": "Since 09:40 UTC every call to /v2/orders returns HTTP 500. Our checkout is completely down for all customers."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T06",
+          "split": "dev",
+          "ticket": {
+            "subject": "Where can I find your office hours?",
+            "body": "Hi, just curious what time zone your support team works in and whether you're open on weekends."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T07",
+          "split": "dev",
+          "ticket": {
+            "subject": "Password reset email never arrives",
+            "body": "I've requested a password reset three times today and nothing shows up, not even in spam. I can still use the mobile app since I'm logged in there."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "medium"
+          }
+        },
+        {
+          "id": "T08",
+          "split": "dev",
+          "ticket": {
+            "subject": "Invoice shows wrong company name",
+            "body": "Our invoices still list our old company name. Finance needs corrected invoices before our audit at the end of the quarter, about six weeks away."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T09",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Former employee still has admin access",
+            "body": "A contractor we let go this morning can still log in as an admin on our workspace. I don't see how to remove them. Please help urgently."
+          },
+          "expected": {
+            "category": "account_access",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T10",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Card declined on renewal, account suspended",
+            "body": "Our annual renewal failed because the card expired, and now the whole team is locked out of the dashboard. I've updated the card but it's still suspended."
+          },
+          "expected": {
+            "category": "billing",
+            "urgency": "high"
+          }
+        },
+        {
+          "id": "T11",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Dark mode toggle doesn't persist",
+            "body": "Every time I reload the page dark mode switches back to light. Minor annoyance, not urgent."
+          },
+          "expected": {
+            "category": "technical_support",
+            "urgency": "low"
+          }
+        },
+        {
+          "id": "T12",
+          "split": "holdout",
+          "ticket": {
+            "subject": "Partnership question",
+            "body": "I run a consultancy and would like to know if you have a reseller or referral partner program."
+          },
+          "expected": {
+            "category": "general_inquiry",
+            "urgency": "low"
+          }
+        }
+      ],
+      "fixtureHash": "39e2541f412ca1e6",
+      "status": "failed",
+      "statusReason": "Stopped manually after the free-tier daily quota (20 requests/day for gemini-3.5-flash) ran out mid-run. A dev-server restart had earlier mislabelled this CLI-owned run as abandoned; that bug is fixed.",
+      "createdAt": "2026-10-24T02:29:09.817Z",
+      "startedAt": "2026-10-24T02:29:09.818Z",
+      "finishedAt": "2026-10-24T02:31:20.791Z",
+      "summary": {
+        "total": 12,
+        "passed": 3,
+        "failed": 0,
+        "errored": 3,
+        "cancelled": 0,
+        "unfinished": 6
+      },
+      "cases": [
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 0,
+          "fixtureId": "T01",
+          "status": "completed",
+          "output": "{\"category\": \"billing\", \"urgency\": \"medium\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"billing\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"medium\"."
+              }
+            ],
+            "predicted": {
+              "category": "billing",
+              "urgency": "medium"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:09.819Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 906,
+            "durationMs": 939,
+            "inputTokens": 271,
+            "outputTokens": 47,
+            "requestId": null,
+            "messageId": "9RfcasC8OZa_qtsPwMPgwQk",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:09.819Z",
+          "finishedAt": "2026-10-24T02:29:10.758Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 1,
+          "fixtureId": "T02",
+          "status": "completed",
+          "output": "{\"category\": \"account_access\", \"urgency\": \"high\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"account_access\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"high\"."
+              }
+            ],
+            "predicted": {
+              "category": "account_access",
+              "urgency": "high"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:10.758Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1135,
+            "durationMs": 1142,
+            "inputTokens": 275,
+            "outputTokens": 72,
+            "requestId": null,
+            "messageId": "9hfcapCDN7eR_uMP2dalKA",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:10.758Z",
+          "finishedAt": "2026-10-24T02:29:11.900Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 2,
+          "fixtureId": "T03",
+          "status": "completed",
+          "output": "{\"category\": \"technical_support\", \"urgency\": \"medium\"}",
+          "interrupted": false,
+          "evaluation": {
+            "passed": true,
+            "checks": [
+              {
+                "name": "json_parse",
+                "status": "passed",
+                "detail": "Response is a bare JSON object."
+              },
+              {
+                "name": "required_fields",
+                "status": "passed",
+                "detail": "category and urgency are present strings."
+              },
+              {
+                "name": "allowed_values",
+                "status": "passed",
+                "detail": "Values are in the allowed sets."
+              },
+              {
+                "name": "category_match",
+                "status": "passed",
+                "detail": "Predicted \"technical_support\"."
+              },
+              {
+                "name": "urgency_match",
+                "status": "passed",
+                "detail": "Predicted \"medium\"."
+              }
+            ],
+            "predicted": {
+              "category": "technical_support",
+              "urgency": "medium"
+            }
+          },
+          "error": null,
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:11.901Z",
+              "outcome": "success",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": 1064,
+            "durationMs": 1095,
+            "inputTokens": 282,
+            "outputTokens": 70,
+            "requestId": null,
+            "messageId": "-BfcavS1AaSY6dkPn7LSyQM",
+            "servedModel": "gemini-3.6-flash",
+            "stopReason": "STOP",
+            "attempts": 1
+          },
+          "startedAt": "2026-10-24T02:29:11.901Z",
+          "finishedAt": "2026-10-24T02:29:12.996Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 3,
+          "fixtureId": "T04",
+          "status": "failed",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": {
+            "kind": "rate_limit",
+            "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate (gave up after 3 attempts)"
+          },
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:29:12.997Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-3.6-flash, description: Generate content requests per minute limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/ra",
+              "requestId": null,
+              "retryDelayMs": 46000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:29:59.144Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 120000
+            },
+            {
+              "attempt": 3,
+              "startedAt": "2026-10-24T02:31:59.322Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": 166524,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 3
+          },
+          "startedAt": "2026-10-24T02:29:12.997Z",
+          "finishedAt": "2026-10-24T02:31:59.521Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 4,
+          "fixtureId": "T05",
+          "status": "failed",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": {
+            "kind": "rate_limit",
+            "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate (gave up after 3 attempts)"
+          },
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:31:59.527Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 120000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:33:59.682Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 120000
+            },
+            {
+              "attempt": 3,
+              "startedAt": "2026-10-24T02:35:59.863Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": 240543,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 3
+          },
+          "startedAt": "2026-10-24T02:31:59.527Z",
+          "finishedAt": "2026-10-24T02:36:00.070Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 5,
+          "fixtureId": "T06",
+          "status": "failed",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": {
+            "kind": "rate_limit",
+            "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate (gave up after 3 attempts)"
+          },
+          "attemptLog": [
+            {
+              "attempt": 1,
+              "startedAt": "2026-10-24T02:36:00.073Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 120000
+            },
+            {
+              "attempt": 2,
+              "startedAt": "2026-10-24T02:38:00.286Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null,
+              "retryDelayMs": 120000
+            },
+            {
+              "attempt": 3,
+              "startedAt": "2026-10-24T02:40:00.517Z",
+              "outcome": "error",
+              "errorKind": "rate_limit",
+              "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\ * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate",
+              "requestId": null
+            }
+          ],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": 240657,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 3
+          },
+          "startedAt": "2026-10-24T02:36:00.073Z",
+          "finishedAt": "2026-10-24T02:40:00.730Z"
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 6,
+          "fixtureId": "T07",
+          "status": "running",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": "2026-10-24T02:40:00.732Z",
+          "finishedAt": null
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 7,
+          "fixtureId": "T08",
+          "status": "queued",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": null,
+          "finishedAt": null
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 8,
+          "fixtureId": "T09",
+          "status": "queued",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": null,
+          "finishedAt": null
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 9,
+          "fixtureId": "T10",
+          "status": "queued",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": null,
+          "finishedAt": null
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 10,
+          "fixtureId": "T11",
+          "status": "queued",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": null,
+          "finishedAt": null
+        },
+        {
+          "runId": "00e754be-b4db-44b1-aa3f-55b836f1bdc6",
+          "index": 11,
+          "fixtureId": "T12",
+          "status": "queued",
+          "output": "",
+          "interrupted": false,
+          "evaluation": null,
+          "error": null,
+          "attemptLog": [],
+          "telemetry": {
+            "ttftMs": null,
+            "durationMs": null,
+            "inputTokens": null,
+            "outputTokens": null,
+            "requestId": null,
+            "messageId": null,
+            "servedModel": null,
+            "stopReason": null,
+            "attempts": 0
+          },
+          "startedAt": null,
+          "finishedAt": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { TICKETS } from "../../fixtures/tickets";
-import type { Fixture, FixtureSelection } from "../../shared/types";
+import type { Fixture, FixtureSelection, HealthResponse } from "../../shared/types";
+import { KEY_VARIABLE } from "../providers";
 import type { Repository } from "../db/repository";
 import type { RunManager } from "../runner/runManager";
 import { streamRun } from "./stream";
@@ -10,7 +11,7 @@ export function selectFixtures(selection: FixtureSelection, all: Fixture[] = TIC
   return selection === "all" ? all : all.filter((f) => f.split === selection);
 }
 
-export function runRoutes(repo: Repository, manager: RunManager, options: { liveAvailable: boolean }) {
+export function runRoutes(repo: Repository, manager: RunManager, options: { providers: HealthResponse["providers"] }) {
   const router = Router();
 
   router.get("/", (_req, res) => {
@@ -27,8 +28,9 @@ export function runRoutes(repo: Repository, manager: RunManager, options: { live
     const input = parseBody(createRunSchema, req.body);
     const prompt = repo.getPromptVersion(input.promptVersionId);
     if (!prompt) throw new HttpError(400, `Prompt version ${input.promptVersionId} does not exist`);
-    if (input.modelSettings.provider === "anthropic" && !options.liveAvailable) {
-      throw new HttpError(400, "Live mode needs ANTHROPIC_API_KEY on the server. Use the mock provider instead.");
+    const provider = input.modelSettings.provider;
+    if (provider !== "mock" && !options.providers[provider].available) {
+      throw new HttpError(400, `The ${provider} provider needs ${KEY_VARIABLE[provider]} on the server. Use the mock provider instead.`);
     }
     const activeId = manager.activeRunId();
     if (activeId) throw new HttpError(409, "Another run is in progress. Stop it or wait for it to finish.");

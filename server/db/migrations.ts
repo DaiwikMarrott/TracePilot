@@ -68,4 +68,11 @@ export const MIGRATIONS: { version: number; name: string; sql: string }[] = [
       CREATE INDEX runs_created_at ON runs(created_at DESC);
     `,
   },
+  {
+    version: 2,
+    name: "record which process is executing a run",
+    // The API server and the CLI can share one database; startup cleanup must
+    // only touch runs whose executing process has actually gone away.
+    sql: `ALTER TABLE runs ADD COLUMN runner_pid INTEGER;`,
+  },
 ];

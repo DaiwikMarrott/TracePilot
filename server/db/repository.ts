@@ -96,6 +96,15 @@ const toCase = (row: CaseRow): CaseResult => ({
   finishedAt: row.finished_at,
 });
 
+function processIsAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0); // signal 0 checks existence without signalling
+    return true;
+  } catch (err) {
+    return (err as NodeJS.ErrnoException).code === "EPERM";
+  }
+}
+
 export function hashFixtures(fixtures: Fixture[]): string {
   return createHash("sha256").update(JSON.stringify(fixtures)).digest("hex").slice(0, 16);
 }
@@ -104,6 +113,9 @@ export class Repository {
   constructor(
     private readonly db: Db,
     private readonly now: () => Date = () => new Date(),
+    /** Process executing runs through this repository; injectable for tests. */
+    private readonly pid: number = process.pid,
+    private readonly isAlive: (pid: number) => boolean = processIsAlive,
   ) {}
 
   // ---- prompt versions ----
@@ -212,10 +224,11 @@ export class Repository {
       .prepare(
         `UPDATE runs SET status = ?, status_reason = ?,
            started_at = CASE WHEN ? = 'running' AND started_at IS NULL THEN ? ELSE started_at END,
-           finished_at = CASE WHEN ? THEN ? ELSE finished_at END
+           finished_at = CASE WHEN ? THEN ? ELSE finished_at END,
+           runner_pid = CASE WHEN ? = 'running' THEN ? ELSE runner_pid END
          WHERE id = ?`,
       )
-      .run(status, reason, status, now, terminal ? 1 : 0, now, id);
+      .run(status, reason, status, now, terminal ? 1 : 0, now, status, this.pid, id);
   }
 
   saveCase(result: CaseResult): void {
@@ -251,15 +264,19 @@ export class Repository {
   }
 
   /**
-   * Called on startup: a run left "queued" or "running" belongs to a process
-   * that no longer exists. Record that honestly instead of leaving it pending.
+   * Called on startup: a run still "running" whose executing process no longer
+   * exists will never finish. Record that honestly instead of leaving it pending.
+   * Runs owned by another live process (e.g. the CLI) are left alone, and queued
+   * runs stay queued because they can still be started.
    */
   failAbandonedRuns(): number {
     const now = this.now().toISOString();
     return this.db.transaction(() => {
-      const abandoned = this.db.prepare("SELECT id FROM runs WHERE status IN ('queued','running')").all() as {
+      const running = this.db.prepare("SELECT id, runner_pid FROM runs WHERE status = 'running'").all() as {
         id: string;
+        runner_pid: number | null;
       }[];
+      const abandoned = running.filter((r) => r.runner_pid === null || r.runner_pid === this.pid || !this.isAlive(r.runner_pid));
       for (const { id } of abandoned) {
         this.db
           .prepare("UPDATE runs SET status = 'failed', status_reason = ?, finished_at = ? WHERE id = ?")

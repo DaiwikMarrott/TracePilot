@@ -14,7 +14,7 @@ export const createPromptVersionSchema = z.object({
 });
 
 export const modelSettingsSchema = z.object({
-  provider: z.enum(["mock", "anthropic"]),
+  provider: z.enum(["mock", "anthropic", "google"]),
   model: z.string().trim().min(1).max(100),
   maxTokens: z.number().int().min(16).max(64_000),
   effort: z.enum(EFFORTS),

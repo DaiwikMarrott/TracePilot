@@ -90,7 +90,14 @@ beforeEach(() => {
       const method = init?.method ?? "GET";
       calls.push({ method, url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
       const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
-      if (url === "/api/health") return json({ ok: true, liveAvailable: false, defaultModel: "claude-opus-5-5", activeRunId: null });
+      if (url === "/api/health") return json({
+          ok: true,
+          providers: {
+            anthropic: { available: false, defaultModel: "claude-opus-5-5" },
+            google: { available: false, defaultModel: "gemini-3.5-flash" },
+          },
+          activeRunId: null,
+        });
       if (url === "/api/prompts") return json(versions);
       if (url === "/api/fixtures") return json(fixtures);
       if (url === "/api/runs" && method === "GET") return json(history);
@@ -137,6 +144,7 @@ describe("primary workflow, keyboard only", () => {
     const status = screen.getAllByRole("status").find((el) => el.textContent?.includes("Case 1 of 2"));
     expect(status).toBeDefined();
     expect(screen.getByLabelText(`Response for ${fixtures[0]!.id}`)).toHaveTextContent('{"category":');
+    expect(screen.getByRole("article", { name: `Case ${fixtures[0]!.id}: unfinished` })).toHaveTextContent("running");
 
     const stop = screen.getByRole("button", { name: "Stop" });
     await tabTo(user, stop);

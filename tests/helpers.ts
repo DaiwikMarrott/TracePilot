@@ -20,7 +20,7 @@ export async function startTestServer(
   overrides: Partial<ServerConfig> = {},
   extra: { manager?: (repo: Repository) => RunManager } = {},
 ): Promise<TestServer> {
-  const config: ServerConfig = { port: 0, dbPath: ":memory:", apiKey: null, defaultModel: "claude-opus-5-5", ...overrides };
+  const config: ServerConfig = { port: 0, dbPath: ":memory:", apiKey: null, defaultModel: "claude-opus-5-5", googleApiKey: null, googleModel: "gemini-3.5-flash", ...overrides };
   const repo = new Repository(openDatabase(config.dbPath));
   repo.seedPromptVersions(SEED_PROMPTS);
   const manager =

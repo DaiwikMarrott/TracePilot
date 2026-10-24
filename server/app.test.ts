@@ -9,7 +9,10 @@ describe("GET /api/health", () => {
     server = await startTestServer({ apiKey: "sk-secret" });
     const res = await fetch(`${server.url}/api/health`);
     const text = await res.text();
-    expect(JSON.parse(text)).toMatchObject({ ok: true, liveAvailable: true });
+    expect(JSON.parse(text)).toMatchObject({
+      ok: true,
+      providers: { anthropic: { available: true }, google: { available: false } },
+    });
     expect(text).not.toContain("sk-secret");
   });
 });

@@ -19,7 +19,12 @@ describe("parseResponseJson", () => {
   });
   it("fails fenced JSON but recovers the object for explanation", () => {
     const r = parseResponseJson('Sure!\n```json\n{"category":"billing"}\n```');
-    expect(r).toMatchObject({ ok: false, reason: expect.stringMatching(/code fence/), recovered: { category: "billing" } });
+    expect(r).toMatchObject({ ok: false, reason: expect.stringMatching(/code fence with extra text/), recovered: { category: "billing" } });
+    // A bare fence (what Gemini returned for v1) is described without inventing "extra text".
+    expect(parseResponseJson('```json\n{"category":"billing"}\n```')).toMatchObject({
+      ok: false,
+      reason: "Response wrapped the JSON in a markdown code fence; the contract requires a bare JSON object.",
+    });
   });
   it("recovers an object embedded in prose", () => {
     expect(parseResponseJson('The answer is {"category":"billing"} thanks')).toMatchObject({

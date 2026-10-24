@@ -25,13 +25,14 @@ export function parseResponseJson(text: string): ParseResult {
     return { ok: true, value };
   } catch (err) {
     const syntax = err instanceof Error ? err.message : String(err);
-    const fenced = FENCE.exec(trimmed)?.[1];
-    if (fenced !== undefined) {
-      const recovered = tryParseObject(fenced);
+    const fence = FENCE.exec(trimmed);
+    if (fence) {
+      const recovered = tryParseObject(fence[1]!);
       if (recovered !== undefined) {
+        const extraText = trimmed.replace(fence[0], "").trim().length > 0;
         return {
           ok: false,
-          reason: "Response wrapped the JSON in a markdown code fence with extra text; the contract requires a bare JSON object.",
+          reason: `Response wrapped the JSON in a markdown code fence${extraText ? " with extra text" : ""}; the contract requires a bare JSON object.`,
           recovered,
         };
       }

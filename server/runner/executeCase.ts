@@ -20,9 +20,13 @@ export interface CaseContext {
 const BASE_BACKOFF_MS = 250;
 const MAX_BACKOFF_MS = 4_000;
 
+// A server-provided delay is the best signal available (Gemini's free tier asks
+// for ~55 s), so honour it up to a generous cap rather than retrying too early.
+const MAX_RETRY_AFTER_MS = 120_000;
+
 /** Exponential backoff without jitter so runs and tests are reproducible; honours retry-after when given. */
 export function retryDelay(attempt: number, retryAfterMs: number | null): number {
-  if (retryAfterMs !== null) return Math.min(retryAfterMs, 30_000);
+  if (retryAfterMs !== null) return Math.min(retryAfterMs, MAX_RETRY_AFTER_MS);
   return Math.min(BASE_BACKOFF_MS * 2 ** (attempt - 1), MAX_BACKOFF_MS);
 }
 
@@ -137,6 +141,14 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
           message: `${failure.message} (after ${result.output.length} characters of output; not retried)`,
         });
       }
+      if (failure.retryable && failure.retryAfterMs !== null && failure.retryAfterMs > MAX_RETRY_AFTER_MS) {
+        // e.g. a daily quota: retrying sooner than the server asks is guaranteed to fail.
+        const minutes = Math.round(failure.retryAfterMs / 60_000);
+        return finish("failed", {
+          kind: failure.kind,
+          message: `${failure.message} (server asked to wait ${minutes} min, longer than the ${MAX_RETRY_AFTER_MS / 1000} s retry limit; not retried)`,
+        });
+      }
       if (!failure.retryable || attempt > settings.maxRetries) {
         const suffix = failure.retryable && settings.maxRetries > 0 ? ` (gave up after ${attempt} attempts)` : "";
         return finish("failed", { kind: failure.kind, message: failure.message + suffix });
@@ -144,6 +156,8 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
 
       const delayMs = retryDelay(attempt, failure.retryAfterMs);
       record.retryDelayMs = delayMs;
+      // Persist the failed attempt now, so a long backoff is visible to anyone not on the live stream.
+      ctx.saveProgress(result);
       ctx.emit({ type: "case_retry", runId: ctx.runId, index: ctx.index, attempt, errorKind: failure.kind, delayMs });
       try {
         await ctx.sleep(delayMs, ctx.signal);
