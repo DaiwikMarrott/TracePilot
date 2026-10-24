@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defaultModelSettings } from "../../../shared/defaults";
 import { summarize } from "../../../shared/summary";
@@ -60,7 +60,9 @@ describe("RunDetails", () => {
   it("connects telemetry to the recorded prompt and settings, keeping unknown usage explicit", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(run))));
     render(<RunDetails id="r" />);
-    expect(await screen.findByRole("heading", { name: /Run details: v2 — Strict/ })).toHaveFocus();
+    const heading = await screen.findByRole("heading", { name: /Run details: v2 — Strict/ });
+    // Focus moves in an effect after the heading renders.
+    await waitFor(() => expect(heading).toHaveFocus());
 
     expect(screen.getByText("claude-opus-5-5", { selector: "dd" })).toBeInTheDocument();
     expect(screen.getByText("SYSTEM TEXT")).toBeInTheDocument();

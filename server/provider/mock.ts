@@ -82,8 +82,9 @@ export class MockProvider implements Provider {
 
     return {
       text: emitted,
-      inputTokens: Math.ceil((request.system.length + request.user.length) / 4),
-      outputTokens: Math.ceil(emitted.length / 4),
+      // No API, so no reported usage. Showing an estimate here would look like a measurement.
+      inputTokens: null,
+      outputTokens: null,
       requestId,
       messageId: `mock_msg_${call}`,
       servedModel: "mock-classifier",

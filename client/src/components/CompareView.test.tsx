@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defaultModelSettings } from "../../../shared/defaults";
@@ -70,7 +70,9 @@ describe("CompareView", () => {
     );
     render(<CompareView a="a" b="b" onOpenRun={() => {}} />);
 
-    expect(await screen.findByRole("heading", { name: "Compare v1 and v2" })).toHaveFocus();
+    const heading = await screen.findByRole("heading", { name: "Compare v1 and v2" });
+    // Focus moves in an effect after the heading renders.
+    await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText(/improved ·/).textContent).toMatch(/1 improved · 1 regressed · 0 pass in both · 0 fail in both · 1 incomplete/);
 
     const t1 = screen.getByRole("heading", { name: /T1 · Subject T1/ }).closest("li")!;
