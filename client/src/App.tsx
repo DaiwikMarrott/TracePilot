@@ -80,6 +80,7 @@ export function App() {
             prompt={versions.find((v) => v.id === selectedVersionId) ?? null}
             fixtures={fixtures}
             onRunFinished={() => void refreshRuns()}
+            onOpenRun={(id) => navigate({ view: "run", id })}
           />
         )}
       </main>

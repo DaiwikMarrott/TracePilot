@@ -21,9 +21,10 @@ interface Props {
   prompt: PromptVersion | null;
   fixtures: Fixture[];
   onRunFinished: () => void;
+  onOpenRun: (id: string) => void;
 }
 
-export function RunPanel({ health, prompt, fixtures, onRunFinished }: Props) {
+export function RunPanel({ health, prompt, fixtures, onRunFinished, onOpenRun }: Props) {
   const [settings, setSettings] = useState<ModelSettings>(() => defaultModelSettings(health?.defaultModel));
   const [selection, setSelection] = useState<FixtureSelection>("dev");
   const [runId, setRunId] = useState<string | null>(null);
@@ -155,6 +156,11 @@ export function RunPanel({ health, prompt, fixtures, onRunFinished }: Props) {
               {run.statusReason && ` — ${run.statusReason}`}
             </span>
             {!inProgress && <SummaryCounts summary={run.summary} />}
+            {!inProgress && (
+              <button type="button" className="link" onClick={() => onOpenRun(run.id)}>
+                Open run details
+              </button>
+            )}
           </>
         ) : (
           <span className="muted">No evaluation running.</span>
