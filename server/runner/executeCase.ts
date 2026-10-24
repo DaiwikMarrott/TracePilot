@@ -1,4 +1,5 @@
 import type { CaseResult, Fixture, RunEvent } from "../../shared/types";
+import { evaluateResponse } from "../evaluate/evaluate";
 import type { Sleep } from "../provider/mock";
 import { ProviderError, type Provider, type ProviderRequest } from "../provider/types";
 
@@ -66,6 +67,7 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
       servedModel: response.servedModel,
       stopReason: response.stopReason,
     });
+    result.evaluation = evaluateResponse(response, ctx.fixture.expected);
   } catch (err) {
     const error =
       err instanceof ProviderError ? err : new ProviderError("unknown", String(err), { retryable: false });

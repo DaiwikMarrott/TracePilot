@@ -4,6 +4,9 @@ import { api, errorMessage } from "./api";
 import { PromptEditor } from "./components/PromptEditor";
 import { RunHistory } from "./components/RunHistory";
 import { RunPanel } from "./components/RunPanel";
+import { CompareView } from "./components/CompareView";
+import { RunDetails } from "./components/RunDetails";
+import { routeHref, useHashRoute, type Route } from "./hooks/useHashRoute";
 
 export function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -13,6 +16,7 @@ export function App() {
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [route, navigate] = useHashRoute();
 
   const refreshRuns = useCallback(() => api.listRuns().then(setRuns), []);
 
@@ -45,7 +49,25 @@ export function App() {
               : "Connecting…")}
         </p>
       </header>
-      <main className="layout two-col">
+      <nav aria-label="Primary" className="tabs">
+        {(
+          [
+            [{ view: "workspace" }, "Workspace"],
+            [{ view: "history" }, "Run history"],
+          ] as [Route, string][]
+        ).map(([r, label]) => (
+          <a
+            key={r.view}
+            href={routeHref(r)}
+            className={(r.view === "workspace") === (route.view === "workspace") ? "active" : undefined}
+            aria-current={route.view === r.view ? "page" : undefined}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+      {/* The workspace stays mounted so an evaluation keeps streaming while you browse history. */}
+      <main className="layout two-col" hidden={route.view !== "workspace"}>
         <PromptEditor
           versions={versions}
           selectedId={selectedVersionId}
@@ -60,14 +82,26 @@ export function App() {
             onRunFinished={() => void refreshRuns()}
           />
         )}
-        <RunHistory
-          runs={runs}
-          selected={compareIds}
-          onToggle={(id) => setCompareIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))}
-          onOpen={() => void refreshRuns()}
-          onCompare={() => {}}
-        />
       </main>
+      {route.view !== "workspace" && (
+        <main className="layout">
+          {route.view === "history" && (
+            <RunHistory
+              runs={runs}
+              selected={compareIds}
+              onToggle={(id) =>
+                setCompareIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
+              }
+              onOpen={(id) => navigate({ view: "run", id })}
+              onCompare={() => navigate({ view: "compare", a: compareIds[0]!, b: compareIds[1]! })}
+            />
+          )}
+          {route.view === "compare" && (
+            <CompareView a={route.a} b={route.b} onOpenRun={(id) => navigate({ view: "run", id })} />
+          )}
+          {route.view === "run" && <RunDetails id={route.id} />}
+        </main>
+      )}
     </div>
   );
 }

@@ -2,14 +2,22 @@ import type { CaseResult, Fixture } from "../../../shared/types";
 import { caseOutcome } from "../../../shared/summary";
 import { OutcomeBadge } from "./badges";
 
-export function CaseCard({ result, fixture, headingLevel = 3 }: { result: CaseResult; fixture?: Fixture; headingLevel?: 3 | 4 }) {
+interface Props {
+  result: CaseResult;
+  fixture?: Fixture;
+  headingLevel?: 3 | 4;
+  /** Overrides the heading, e.g. "Run A" in the comparison view. */
+  title?: string;
+}
+
+export function CaseCard({ result, fixture, headingLevel = 3, title }: Props) {
   const Heading = `h${headingLevel}` as const;
   const outcome = caseOutcome(result);
   return (
     <article className="case" aria-label={`Case ${result.fixtureId}: ${outcome}`}>
       <div className="row spread">
         <Heading>
-          {result.fixtureId}
+          {title ?? result.fixtureId}
           {fixture && <span className="muted"> · {fixture.ticket.subject}</span>}
         </Heading>
         <OutcomeBadge outcome={outcome} interrupted={result.interrupted} />

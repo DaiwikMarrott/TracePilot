@@ -112,8 +112,6 @@ tr[aria-selected="true"] td { background: var(--info-bg); }
 .counts { display: inline-flex; gap: 0.6rem; flex-wrap: wrap; }
 
 .tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); padding: 0 1.5rem; background: var(--surface); }
-.tabs [role="tab"] { background: none; border: none; border-bottom: 3px solid transparent; border-radius: 0; color: var(--muted); padding: 0.6rem 0.9rem; }
-.tabs [role="tab"][aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
 
 .cases { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .case { border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.75rem; display: grid; gap: 0.35rem; }
@@ -128,3 +126,6 @@ tr[aria-selected="true"] td { background: var(--info-bg); }
 dl.meta { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; font-size: 0.9rem; }
 dl.meta dt { color: var(--muted); }
 dl.meta dd { margin: 0; overflow-wrap: anywhere; }
+.tabs a { display: inline-block; padding: 0.6rem 0.9rem; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; font-weight: 600; }
+.tabs a.active { color: var(--text); border-bottom-color: var(--accent); }
+[hidden] { display: none !important; }
