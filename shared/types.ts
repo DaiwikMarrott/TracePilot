@@ -186,6 +186,7 @@ export interface ApiErrorBody {
 // ---- Server-sent events (GET /api/runs/:id/stream) ----
 
 export type RunEvent =
+  | { type: "snapshot"; run: RunWithCases }
   | { type: "run_status"; runId: string; status: RunStatus; reason: string | null }
   | { type: "case_status"; runId: string; index: number; status: CaseStatus }
   | { type: "case_retry"; runId: string; index: number; attempt: number; errorKind: ErrorKind; delayMs: number }
