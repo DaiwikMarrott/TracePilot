@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+# Local SQLite databases and generated data
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+# Secrets
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
