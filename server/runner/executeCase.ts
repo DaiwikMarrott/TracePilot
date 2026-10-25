@@ -24,10 +24,15 @@ const MAX_BACKOFF_MS = 4_000;
 // for ~55 s), so honour it up to a generous cap rather than retrying too early.
 const MAX_RETRY_AFTER_MS = 120_000;
 
-/** Exponential backoff without jitter so runs and tests are reproducible; honours retry-after when given. */
+/**
+ * Exponential backoff without jitter so runs and tests are reproducible. A
+ * server-requested delay is honoured but never undercuts the backoff: Gemini
+ * has been seen to send `retryDelay: 0s` while still rate limiting.
+ */
 export function retryDelay(attempt: number, retryAfterMs: number | null): number {
-  if (retryAfterMs !== null) return Math.min(retryAfterMs, MAX_RETRY_AFTER_MS);
-  return Math.min(BASE_BACKOFF_MS * 2 ** (attempt - 1), MAX_BACKOFF_MS);
+  const backoff = Math.min(BASE_BACKOFF_MS * 2 ** (attempt - 1), MAX_BACKOFF_MS);
+  if (retryAfterMs !== null) return Math.min(Math.max(retryAfterMs, backoff), MAX_RETRY_AFTER_MS);
+  return backoff;
 }
 
 class DeadlineExceeded extends Error {}

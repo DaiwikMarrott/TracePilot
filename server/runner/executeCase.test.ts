@@ -106,6 +106,9 @@ describe("executeCase", () => {
   it("uses bounded exponential backoff and gives up after maxRetries", async () => {
     expect([1, 2, 3, 10].map((a) => retryDelay(a, null))).toEqual([250, 500, 1000, 4000]);
     expect(retryDelay(1, 53_000)).toBe(53_000);
+    // A zero (or tiny) requested delay never undercuts the normal backoff.
+    expect(retryDelay(1, 0)).toBe(250);
+    expect(retryDelay(3, 100)).toBe(1000);
     expect(retryDelay(1, 600_000)).toBe(120_000);
     const provider = scripted(fail("overloaded", true), fail("overloaded", true), fail("overloaded", true), ok(goodJson));
     const { ctx } = context(provider, { maxRetries: 2 });
