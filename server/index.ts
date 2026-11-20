@@ -1,3 +1,4 @@
+import "./startup/checkNode";
 import { SEED_PROMPTS } from "../fixtures/prompts";
 import { createApp } from "./app";
 import { loadConfig } from "./config";

@@ -15,6 +15,7 @@
     "start": "tsx --env-file-if-exists=.env server/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p client/tsconfig.json --noEmit",
     "lint": "eslint .",
+    "pretest": "tsx server/startup/checkNode.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint && npm test",

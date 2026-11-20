@@ -20,6 +20,8 @@ Claude is the target provider. Until an Anthropic key is configured, the live re
 
 Requires Node.js **22.12 or newer** (`.nvmrc` pins 24).
 
+The server, the CLI and `npm test` check the Node version first and exit with a message saying how to fix it. Without that check, an older Node can crash inside better-sqlite3's native module with a bare `SIGSEGV`.
+
 ```sh
 git clone <this repo> && cd tracepilot
 nvm use            # optional

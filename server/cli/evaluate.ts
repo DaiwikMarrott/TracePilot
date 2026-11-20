@@ -3,6 +3,7 @@
 // uses, so they can be inspected and compared there afterwards.
 //
 //   npm run eval -- --provider google --split all --versions 1,2 --repeat 3 --json report.json
+import "../startup/checkNode";
 import { writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { SEED_PROMPTS } from "../../fixtures/prompts";
