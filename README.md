@@ -231,6 +231,6 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 - **No variance measured.** Every live case ran once. Rerun with `--repeat 3` when quota allows.
 - **Small, synthetic fixtures.** A 4-case holdout cannot show statistically meaningful differences. A real evaluation needs more cases, including more ambiguous ones like T10.
 - **Untested prompt ablation.** The results suggest the format instruction, not the rubric, drives the pass rate. A v3 that keeps only the "bare JSON" instruction would test that.
-- A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server is meant to run on localhost only.
+- A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server listens on `127.0.0.1` by default (`HOST` overrides it, with a warning at startup).
 - No cost estimates. Token counts are shown, but prices change and are not hard-coded.
 - Partial output is saved when a case finishes or before a retry wait, not continuously, so a server crash mid-stream loses that case's text (the run is still marked failed on restart).

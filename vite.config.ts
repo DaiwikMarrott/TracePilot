@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": { target: `http://localhost:${serverPort}`, changeOrigin: false },
+      "/api": { target: `http://127.0.0.1:${serverPort}`, changeOrigin: false },
     },
   },
   build: { outDir: "../dist/client", emptyOutDir: true },
