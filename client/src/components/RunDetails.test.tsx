@@ -78,4 +78,11 @@ describe("RunDetails", () => {
     expect(screen.getByText(/partial output above was preserved/)).toBeInTheDocument();
     expect(screen.getByText(/rate_limit: 429/)).toHaveTextContent("retried after 500 ms");
   });
+
+  it("offers the run as JSON and CSV downloads", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(run))));
+    render(<RunDetails id="r" />);
+    expect(await screen.findByRole("link", { name: "JSON (full record)" })).toHaveAttribute("href", "/api/runs/r/export?format=json");
+    expect(screen.getByRole("link", { name: "CSV (one row per case)" })).toHaveAttribute("href", "/api/runs/r/export?format=csv");
+  });
 });

@@ -39,6 +39,7 @@ export const api = {
   getRun: (id: string) => request<RunWithCases>(`/api/runs/${encodeURIComponent(id)}`),
   createRun: (input: CreateRunRequest) =>
     request<RunWithCases>("/api/runs", { method: "POST", body: JSON.stringify(input) }),
+  exportUrl: (id: string, format: "json" | "csv") => `/api/runs/${encodeURIComponent(id)}/export?format=${format}`,
   cancelRun: (id: string) => request<{ ok: true }>(`/api/runs/${encodeURIComponent(id)}/cancel`, { method: "POST" }),
 };
 
