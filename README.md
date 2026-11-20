@@ -87,6 +87,8 @@ docs/media/        demo recordings
 
 **Export.** `GET /api/runs/:id/export?format=json` downloads the full run record. `format=csv` gives one row per case: recorded inputs, expected and predicted labels, outcome, failed checks and telemetry. Unknown values are empty cells, never 0. Cells a spreadsheet would run as formulas are escaped, because error messages can echo API text. The run-details view links to both.
 
+**Comparison telemetry.** The compare view puts both runs' median time to first text, median case duration, and mean input and output tokens per case side by side. Only completed cases count, because failed and cancelled cases have truncated timings that would flatter a run. Means are per case, so runs with different numbers of completed cases stay comparable. A relative change is shown only when both runs reported every value; otherwise the cell shows a dash instead of a number built on unknowns.
+
 **State.** Runs move `queued → running → completed | failed | cancelled`. Cases move `queued → running → completed | failed | cancelled`. A case that never started stays `queued` and is shown as **unfinished**. The interface groups cases into five buckets — passed, failed checks, error, cancelled, unfinished — so an incomplete evaluation never looks like a clean result.
 
 **Several processes, one database.** The API server and the CLI can share the same SQLite file. Each running run records the PID of the process executing it. On startup, the server marks a run failed only if that process no longer exists, so restarting the server never mislabels a CLI run that is still going. Queued runs stay queued, because they can still be started.

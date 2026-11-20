@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CaseResult, Fixture, RunWithCases } from "../../../shared/types";
 import { caseOutcome } from "../../../shared/summary";
+import { relativeChange, summarizeTelemetry, type Measured } from "../../../shared/stats";
 import { api, errorMessage } from "../api";
 import { RunStatusBadge, SummaryCounts } from "./badges";
 import { CaseCard } from "./CaseCard";
@@ -83,6 +84,7 @@ export function CompareView({ a, b, onOpenRun }: { a: string; b: string; onOpenR
           </div>
         ))}
       </div>
+      <TelemetryComparison runA={runA} runB={runB} />
       <div className="row spread">
         <p>
           <strong>{counts.improved}</strong> improved · <strong>{counts.regressed}</strong> regressed ·{" "}
@@ -125,4 +127,58 @@ export function CompareView({ a, b, onOpenRun }: { a: string; b: string; onOpenR
 
 function changeClass(change: Change) {
   return { improved: "passed", regressed: "failed", "same pass": "completed", "same fail": "errored", incomplete: "cancelled" }[change];
+}
+
+const formatMs = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(2)} s` : `${Math.round(v)} ms`);
+const formatTokens = (v: number) => Math.round(v).toLocaleString();
+
+function formatMeasured(m: Measured, format: (v: number) => string): string {
+  if (m.value === null) return "unknown";
+  return m.unknown > 0 ? `${format(m.value)} (${m.unknown} unknown)` : format(m.value);
+}
+
+function formatChange(a: Measured, b: Measured): string {
+  const change = relativeChange(a, b);
+  if (change === null) return "—";
+  const pct = Math.round(change * 100);
+  return pct === 0 ? "no change" : `${pct > 0 ? "+" : ""}${pct}%`;
+}
+
+function TelemetryComparison({ runA, runB }: { runA: RunWithCases; runB: RunWithCases }) {
+  const a = summarizeTelemetry(runA.cases);
+  const b = summarizeTelemetry(runB.cases);
+  const rows: [string, Measured, Measured, (v: number) => string][] = [
+    ["Median time to first text", a.medianTtftMs, b.medianTtftMs, formatMs],
+    ["Median case duration", a.medianDurationMs, b.medianDurationMs, formatMs],
+    ["Mean input tokens per case", a.meanInputTokens, b.meanInputTokens, formatTokens],
+    ["Mean output tokens per case", a.meanOutputTokens, b.meanOutputTokens, formatTokens],
+  ];
+  return (
+    <div className="table-wrap">
+      <table>
+        <caption>
+          Latency and usage over completed cases (A: {a.completed}, B: {b.completed}). A change is shown only when both
+          runs reported every value.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            <th scope="col">A</th>
+            <th scope="col">B</th>
+            <th scope="col">B vs A</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, ma, mb, format]) => (
+            <tr key={label}>
+              <th scope="row">{label}</th>
+              <td>{formatMeasured(ma, format)}</td>
+              <td>{formatMeasured(mb, format)}</td>
+              <td>{formatChange(ma, mb)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
