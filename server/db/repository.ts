@@ -143,11 +143,25 @@ export class Repository {
     })();
   }
 
+  /**
+   * Adds any seed prompt not already present (matched on exact text), in order.
+   * A seed's parentId is the 1-based position of another seed, or null for the
+   * previous seed. Existing versions are never touched.
+   */
   seedPromptVersions(seeds: CreatePromptVersionRequest[]): void {
-    const { count } = this.db.prepare("SELECT COUNT(*) AS count FROM prompt_versions").get() as { count: number };
-    if (count > 0) return;
-    let parentId: number | null = null;
-    for (const seed of seeds) parentId = this.createPromptVersion({ ...seed, parentId }).id;
+    this.db.transaction(() => {
+      const find = this.db.prepare("SELECT id FROM prompt_versions WHERE system_prompt = ? AND user_template = ? ORDER BY version LIMIT 1");
+      const ids: number[] = [];
+      seeds.forEach((seed, i) => {
+        const existing = find.get(seed.systemPrompt, seed.userTemplate) as { id: number } | undefined;
+        if (existing) {
+          ids.push(existing.id);
+          return;
+        }
+        const parentId = seed.parentId !== null ? (ids[seed.parentId - 1] ?? null) : i > 0 ? ids[i - 1]! : null;
+        ids.push(this.createPromptVersion({ ...seed, parentId }).id);
+      });
+    })();
   }
 
   // ---- runs ----

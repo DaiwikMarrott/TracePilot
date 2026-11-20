@@ -40,7 +40,7 @@ Open http://localhost:5173, choose a prompt version, and press **Start evaluatio
 | `npm run check` | Typecheck, lint and test, as CI does |
 | `npm run build` | Production build of the interface |
 
-Local data lives in `data/tracepilot.db`, which is ignored by Git. Delete it to reset the workspace; the two seed prompt versions are recreated on the next start.
+Local data lives in `data/tracepilot.db`, which is ignored by Git. Delete it to reset the workspace; the seed prompt versions are recreated on the next start. Seed prompts added in later releases are appended to existing workspaces, and versions you created are never changed.
 
 ## Providers: mock, Claude, and Gemini
 
@@ -115,7 +115,7 @@ Both SDKs have their own retries disabled (Anthropic `maxRetries: 0`, Google `re
 
 ### Method
 
-- **Prompts.** v1 *Baseline*: a four-line instruction that asks for JSON. v2 *Strict JSON + urgency rubric*: demands a bare JSON object with no code fences, defines each category, gives urgency guidelines, and says to classify by root cause.
+- **Prompts.** v1 *Baseline*: a four-line instruction that asks for JSON. v2 *Strict JSON + urgency rubric*: demands a bare JSON object with no code fences, defines each category, gives urgency guidelines, and says to classify by root cause. (v3, an ablation added after these runs, is described under Limitations.)
 - **Cases.** The 8 dev tickets (T01–T08) were used while writing prompts; the 4 holdout tickets (T09–T12) were reserved for the final evaluation and not used to tune wording.
 - **Settings.** Effort `low` (Gemini thinking level LOW), max tokens 4,096, deadline 30 s per attempt, up to 2 retries before output. Each case was run **once**: the free tier's 20 requests per model per day did not allow repetitions, so these results show no run-to-run variance.
 - **Command.** `npm run eval -- --provider google --model <model> --split <split> --versions 1,2 --json docs/eval/<file>.json`. The raw records, including every check explanation and attempt, are in [`docs/eval/`](docs/eval).
@@ -165,6 +165,8 @@ The free tier exercised the failure paths for real:
 | The dev server restarted (file watcher) while the CLI was mid-run, and marked the CLI's run as abandoned | **Fixed:** runs now record their owner's PID (migration 2), and startup cleanup skips runs whose process is still alive. The affected record's status reason was corrected by hand to say what happened. |
 
 ### Mock provider
+
+v3 on the mock: dev 3/8, holdout 1/4. Its JSON is always bare, but it inherits v1's naive urgency rule, because the mock only uses better urgency when the prompt contains "urgency guidelines". That is a property of the mock's keyword rules, so it says nothing about the ablation; only a live run can answer that.
 
 `npm run eval -- --provider mock --split holdout`: v1 0/4 (code fence, plus wrong urgency on T11 and T12 and a wrong category on T10); v2 4/4. Dev: v1 0/8, v2 8/8. These figures only show that the pipeline and explanations work; the mock's rules were written alongside v2.
 
@@ -232,6 +234,6 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 - **Claude results are pending** an Anthropic key; the commands are above.
 - **No variance measured.** Every live case ran once. Rerun with `--repeat 3` when quota allows.
 - **Small, synthetic fixtures.** A 4-case holdout cannot show statistically meaningful differences. A real evaluation needs more cases, including more ambiguous ones like T10.
-- **Untested prompt ablation.** The results suggest the format instruction, not the rubric, drives the pass rate. A v3 that keeps only the "bare JSON" instruction would test that.
+- **Prompt ablation not yet run live.** The results suggest the format instruction, not the rubric, drives the pass rate. The seeded v3 (*Baseline + bare JSON only*: v1 plus v2's format sentence) tests that; run it with `npm run eval -- --provider anthropic --split holdout --versions 1,2,3`.
 - A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server listens on `127.0.0.1` by default (`HOST` overrides it, with a warning at startup).
 - No cost estimates. Token counts are shown, but prices change and are not hard-coded.

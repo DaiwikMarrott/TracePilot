@@ -39,10 +39,28 @@ describe("prompt versions", () => {
 
     const reopened = new Repository(openDatabase(path));
     reopened.seedPromptVersions(SEED_PROMPTS); // must not duplicate seeds
-    expect(reopened.listPromptVersions().map((v) => [v.version, v.label])).toEqual([
-      [1, "Baseline"],
-      [2, "Strict JSON + urgency rubric"],
-      [3, "Edited"],
+    expect(reopened.listPromptVersions().map((v) => [v.version, v.label, v.parentId])).toEqual([
+      [1, "Baseline", null],
+      [2, "Strict JSON + urgency rubric", 1],
+      [3, "Baseline + bare JSON only", 1],
+      [4, "Edited", 2],
+    ]);
+  });
+
+  it("appends seeds added after a workspace was created, without touching existing versions", () => {
+    const path = tempDbPath();
+    const older = new Repository(openDatabase(path));
+    older.seedPromptVersions(SEED_PROMPTS.slice(0, 2)); // a workspace from before v3 existed
+    older.createPromptVersion({ label: "Mine", systemPrompt: "x", userTemplate: "{{body}}", parentId: 2 });
+
+    const upgraded = new Repository(openDatabase(path));
+    upgraded.seedPromptVersions(SEED_PROMPTS);
+    upgraded.seedPromptVersions(SEED_PROMPTS);
+    expect(upgraded.listPromptVersions().map((v) => [v.version, v.label, v.parentId])).toEqual([
+      [1, "Baseline", null],
+      [2, "Strict JSON + urgency rubric", 1],
+      [3, "Mine", 2],
+      [4, "Baseline + bare JSON only", 1],
     ]);
   });
 
@@ -138,7 +156,7 @@ describe("run snapshots via the API", () => {
       body: JSON.stringify({ label: "Tweak", systemPrompt: original + "\nBe terse.", userTemplate: "{{body}}", parentId: 2 }),
     });
     expect(edit.status).toBe(201);
-    expect(edit.body.version).toBe(3);
+    expect(edit.body.version).toBe(SEED_PROMPTS.length + 1);
 
     const versions = await server.json<PromptVersion[]>("/api/prompts");
     expect(versions.body.find((v) => v.id === 2)!.systemPrompt).toBe(original);
