@@ -105,6 +105,8 @@ docs/media/        demo recordings
 | Malformed output | The case completes; the `json_parse` check fails with the parser's reason. |
 | Unusual stop reason (anything except Claude's `end_turn` or Gemini's `STOP`, e.g. `max_tokens`, `refusal`, `SAFETY`) | Recorded per case and quoted in the JSON check's explanation. |
 
+While a case streams, its partial output is saved to SQLite at most once per second. If the server dies mid-stream, startup cleanup marks the run failed and labels that case **interrupted**, keeping the text saved up to that point.
+
 Per case, TracePilot records time to first text (measured from the start of the successful attempt), total duration including retries, API-reported input and output tokens, request ID, message ID, served model, stop reason and the attempt log. **Missing values stay `null` and are shown as "unknown"**: run totals become a lower bound ("≥ 1,240 (1 unknown)") instead of a sum that quietly treats unknown as zero. The run-details view puts these measurements next to the exact prompt text and model settings that produced them.
 
 Both SDKs have their own retries disabled (Anthropic `maxRetries: 0`, Google `retryOptions.attempts: 1`), so the runner owns the retry policy and every attempt is visible.
@@ -233,4 +235,3 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 - **Untested prompt ablation.** The results suggest the format instruction, not the rubric, drives the pass rate. A v3 that keeps only the "bare JSON" instruction would test that.
 - A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server listens on `127.0.0.1` by default (`HOST` overrides it, with a warning at startup).
 - No cost estimates. Token counts are shown, but prices change and are not hard-coded.
-- Partial output is saved when a case finishes or before a retry wait, not continuously, so a server crash mid-stream loses that case's text (the run is still marked failed on restart).

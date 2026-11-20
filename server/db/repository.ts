@@ -277,10 +277,23 @@ export class Repository {
         runner_pid: number | null;
       }[];
       const abandoned = running.filter((r) => r.runner_pid === null || r.runner_pid === this.pid || !this.isAlive(r.runner_pid));
+      const lostCase = JSON.stringify({ kind: "unknown", message: "Server stopped while this case was running" });
+      const interruptedCase = JSON.stringify({
+        kind: "stream_interrupted",
+        message: "Server stopped while this case was streaming; output saved up to that point is kept",
+      });
       for (const { id } of abandoned) {
         this.db
           .prepare("UPDATE runs SET status = 'failed', status_reason = ?, finished_at = ? WHERE id = ?")
           .run("Server stopped before the run finished", now, id);
+        // The case that was executing has partial output saved while it streamed; label it like any other interruption.
+        this.db
+          .prepare(
+            `UPDATE case_results SET status = 'failed', interrupted = (output <> ''),
+               error = CASE WHEN output <> '' THEN ? ELSE ? END, finished_at = ?
+             WHERE run_id = ? AND status = 'running'`,
+          )
+          .run(interruptedCase, lostCase, now, id);
       }
       return abandoned.length;
     })();

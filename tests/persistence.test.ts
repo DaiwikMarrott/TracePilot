@@ -77,6 +77,30 @@ describe("prompt versions", () => {
     expect(after.summary.unfinished).toBe(2);
   });
 
+  it("keeps partial output saved mid-stream and labels that case interrupted after a crash", () => {
+    const path = tempDbPath();
+    const db = openDatabase(path);
+    const repo = new Repository(db, undefined, 4242);
+    repo.seedPromptVersions(SEED_PROMPTS);
+    const run = repo.createRun({
+      prompt: repo.getPromptVersion(1)!,
+      modelSettings: defaultModelSettings(),
+      fixtureSelection: "dev",
+      fixtures: TICKETS.slice(0, 2),
+    });
+    repo.setRunStatus(run.id, "running");
+    // What executeCase's periodic save leaves behind when the process dies mid-stream.
+    repo.saveCase({ ...run.cases[0]!, status: "running", output: '{"category": "bill', startedAt: new Date().toISOString(), telemetry: { ...run.cases[0]!.telemetry, attempts: 1 } });
+    db.close();
+
+    const reopened = new Repository(openDatabase(path), undefined, 5000, () => false);
+    reopened.failAbandonedRuns();
+    const [streaming, notStarted] = reopened.getCases(run.id);
+    expect(streaming).toMatchObject({ status: "failed", interrupted: true, output: '{"category": "bill', error: { kind: "stream_interrupted" } });
+    expect(streaming!.finishedAt).not.toBeNull();
+    expect(notStarted).toMatchObject({ status: "queued", output: "", error: null });
+  });
+
   it("leaves running runs owned by another live process (e.g. the CLI) and queued runs alone", () => {
     const path = tempDbPath();
     const cli = new Repository(openDatabase(path), undefined, 4242);

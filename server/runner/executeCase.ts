@@ -25,6 +25,12 @@ const MAX_BACKOFF_MS = 4_000;
 const MAX_RETRY_AFTER_MS = 120_000;
 
 /**
+ * How often streamed text is written to the database while a case runs. Without
+ * it, a crash mid-stream would lose text the developer already saw.
+ */
+export const PROGRESS_SAVE_INTERVAL_MS = 1_000;
+
+/**
  * Exponential backoff without jitter so runs and tests are reproducible. A
  * server-requested delay is honoured but never undercuts the backoff: Gemini
  * has been seen to send `retryDelay: 0s` while still rate limiting.
@@ -73,6 +79,7 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
     finishedAt: null,
   };
   ctx.saveProgress(result);
+  let lastSavedAt = caseStart;
   ctx.emit({ type: "case_status", runId: ctx.runId, index: ctx.index, status: "running" });
 
   const finish = (status: CaseResult["status"], error: CaseResult["error"] = null) => {
@@ -108,6 +115,11 @@ export async function executeCase(ctx: CaseContext): Promise<CaseResult> {
             if (firstTextAt === null) firstTextAt = ctx.now();
             result.output += text;
             ctx.emit({ type: "case_delta", runId: ctx.runId, index: ctx.index, text });
+            const now = ctx.now();
+            if (now - lastSavedAt >= PROGRESS_SAVE_INTERVAL_MS) {
+              lastSavedAt = now;
+              ctx.saveProgress(result);
+            }
           },
         },
         signal,

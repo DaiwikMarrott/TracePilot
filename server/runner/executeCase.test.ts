@@ -99,8 +99,9 @@ describe("executeCase", () => {
       { attempt: 2, outcome: "success", requestId: "req_ok" },
     ]);
     expect(events.find((e) => e.type === "case_retry")).toMatchObject({ attempt: 1, errorKind: "rate_limit", delayMs: 1500 });
-    // Saved at start and again before the backoff, with the failed attempt recorded.
-    expect(saved).toEqual([0, 1]);
+    // Saved at start, again before the backoff with the failed attempt recorded, and once
+    // more when text arrives, since more than the progress interval has passed.
+    expect(saved).toEqual([0, 1, 2]);
   });
 
   it("uses bounded exponential backoff and gives up after maxRetries", async () => {
@@ -183,5 +184,22 @@ describe("executeCase", () => {
     expect(provider.calls).toBe(1);
     expect(result.status).toBe("cancelled");
     expect(result.error).toEqual({ kind: "cancelled", message: "Stopped by user" });
+  });
+
+  it("saves streamed output at most once per interval while a case runs", async () => {
+    const chunks = ['{"category"', ': "billing"', ', "urgency"', ': "medium"}'];
+    const slowStream: Step = async (onText) => {
+      for (const chunk of chunks) {
+        await new Promise((r) => setTimeout(r, 400));
+        onText(chunk);
+      }
+      return { text: chunks.join(""), inputTokens: 1, outputTokens: 1, requestId: null, messageId: null, servedModel: null, stopReason: "end_turn" };
+    };
+    const { ctx } = context(scripted(slowStream), { timeoutMs: 10_000 });
+    const saved: string[] = [];
+    ctx.saveProgress = (r: CaseResult) => void saved.push(r.output);
+    await drive(executeCase(ctx));
+    // Initial save at start, then once the 1 s interval has passed (chunk 3 at 1.2 s); chunk 4 at 1.6 s is too soon.
+    expect(saved).toEqual(["", chunks.slice(0, 3).join("")]);
   });
 });
