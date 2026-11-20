@@ -1,3 +1,4 @@
+import "./startup/checkNode";
 import { SEED_PROMPTS } from "../fixtures/prompts";
 import { createApp } from "./app";
 import { loadConfig } from "./config";
@@ -18,11 +19,14 @@ const manager = new RunManager({
 });
 
 const app = createApp({ config, repo, manager });
-app.listen(config.port, () => {
+app.listen(config.port, config.host, () => {
   const live = [
     config.apiKey && `Claude (${config.defaultModel})`,
     config.googleApiKey && `Gemini (${config.googleModel})`,
   ].filter(Boolean);
   const mode = live.length ? `mock, ${live.join(", ")}` : "mock only (no ANTHROPIC_API_KEY or GEMINI_API_KEY)";
-  console.log(`TracePilot API listening on http://localhost:${config.port} — providers: ${mode}`);
+  if (!["127.0.0.1", "localhost", "::1"].includes(config.host)) {
+    console.warn(`HOST=${config.host} exposes the API beyond this machine. It has no authentication and can spend your API quota.`);
+  }
+  console.log(`TracePilot API listening on http://${config.host}:${config.port} — providers: ${mode}`);
 });

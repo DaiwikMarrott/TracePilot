@@ -20,6 +20,8 @@ Claude is the target provider. Until an Anthropic key is configured, the live re
 
 Requires Node.js **22.12 or newer** (`.nvmrc` pins 24).
 
+The server, the CLI and `npm test` check the Node version first and exit with a message saying how to fix it. Without that check, an older Node can crash inside better-sqlite3's native module with a bare `SIGSEGV`.
+
 ```sh
 git clone <this repo> && cd tracepilot
 nvm use            # optional
@@ -38,7 +40,7 @@ Open http://localhost:5173, choose a prompt version, and press **Start evaluatio
 | `npm run check` | Typecheck, lint and test, as CI does |
 | `npm run build` | Production build of the interface |
 
-Local data lives in `data/tracepilot.db`, which is ignored by Git. Delete it to reset the workspace; the two seed prompt versions are recreated on the next start.
+Local data lives in `data/tracepilot.db`, which is ignored by Git. Delete it to reset the workspace; the seed prompt versions are recreated on the next start. Seed prompts added in later releases are appended to existing workspaces, and versions you created are never changed.
 
 ## Providers: mock, Claude, and Gemini
 
@@ -83,6 +85,12 @@ docs/media/        demo recordings
 
 **Request flow.** `POST /api/runs` validates the request, copies the prompt version, model settings and selected fixtures into a new `queued` run, and returns it. The client then opens `GET /api/runs/:id/stream` (server-sent events). Opening the stream starts the run, so execution is tied to an observer. The runner executes cases **one at a time** and emits `run_status`, `case_status`, `case_delta`, `case_retry`, `case_result` and `run_end` events. `POST /api/runs/:id/cancel` (the **Stop** button), or the last client disconnecting, aborts the run's `AbortController`. That signal is passed to the SDK, so the in-flight HTTP request is aborted, not just ignored.
 
+**Export.** `GET /api/runs/:id/export?format=json` downloads the full run record. `format=csv` gives one row per case: recorded inputs, expected and predicted labels, outcome, failed checks and telemetry. Unknown values are empty cells, never 0. Cells a spreadsheet would run as formulas are escaped, because error messages can echo API text. The run-details view links to both.
+
+**Comparison telemetry.** The compare view puts both runs' median time to first text, median case duration, and mean input and output tokens per case side by side. Only completed cases count, because failed and cancelled cases have truncated timings that would flatter a run. Means are per case, so runs with different numbers of completed cases stay comparable. A relative change is shown only when both runs reported every value; otherwise the cell shows a dash instead of a number built on unknowns.
+
+**History filters.** Run history can be filtered by prompt version, provider and status. Each filter offers only values that occur in the history. A run selected for comparison stays selected when a filter hides it, and the selection count says how many are hidden.
+
 **State.** Runs move `queued → running → completed | failed | cancelled`. Cases move `queued → running → completed | failed | cancelled`. A case that never started stays `queued` and is shown as **unfinished**. The interface groups cases into five buckets — passed, failed checks, error, cancelled, unfinished — so an incomplete evaluation never looks like a clean result.
 
 **Several processes, one database.** The API server and the CLI can share the same SQLite file. Each running run records the PID of the process executing it. On startup, the server marks a run failed only if that process no longer exists, so restarting the server never mislabels a CLI run that is still going. Queued runs stay queued, because they can still be started.
@@ -103,6 +111,8 @@ docs/media/        demo recordings
 | Malformed output | The case completes; the `json_parse` check fails with the parser's reason. |
 | Unusual stop reason (anything except Claude's `end_turn` or Gemini's `STOP`, e.g. `max_tokens`, `refusal`, `SAFETY`) | Recorded per case and quoted in the JSON check's explanation. |
 
+While a case streams, its partial output is saved to SQLite at most once per second. If the server dies mid-stream, startup cleanup marks the run failed and labels that case **interrupted**, keeping the text saved up to that point.
+
 Per case, TracePilot records time to first text (measured from the start of the successful attempt), total duration including retries, API-reported input and output tokens, request ID, message ID, served model, stop reason and the attempt log. **Missing values stay `null` and are shown as "unknown"**: run totals become a lower bound ("≥ 1,240 (1 unknown)") instead of a sum that quietly treats unknown as zero. The run-details view puts these measurements next to the exact prompt text and model settings that produced them.
 
 Both SDKs have their own retries disabled (Anthropic `maxRetries: 0`, Google `retryOptions.attempts: 1`), so the runner owns the retry policy and every attempt is visible.
@@ -111,7 +121,7 @@ Both SDKs have their own retries disabled (Anthropic `maxRetries: 0`, Google `re
 
 ### Method
 
-- **Prompts.** v1 *Baseline*: a four-line instruction that asks for JSON. v2 *Strict JSON + urgency rubric*: demands a bare JSON object with no code fences, defines each category, gives urgency guidelines, and says to classify by root cause.
+- **Prompts.** v1 *Baseline*: a four-line instruction that asks for JSON. v2 *Strict JSON + urgency rubric*: demands a bare JSON object with no code fences, defines each category, gives urgency guidelines, and says to classify by root cause. (v3, an ablation added after these runs, is described under Limitations.)
 - **Cases.** The 8 dev tickets (T01–T08) were used while writing prompts; the 4 holdout tickets (T09–T12) were reserved for the final evaluation and not used to tune wording.
 - **Settings.** Effort `low` (Gemini thinking level LOW), max tokens 4,096, deadline 30 s per attempt, up to 2 retries before output. Each case was run **once**: the free tier's 20 requests per model per day did not allow repetitions, so these results show no run-to-run variance.
 - **Command.** `npm run eval -- --provider google --model <model> --split <split> --versions 1,2 --json docs/eval/<file>.json`. The raw records, including every check explanation and attempt, are in [`docs/eval/`](docs/eval).
@@ -162,6 +172,8 @@ The free tier exercised the failure paths for real:
 
 ### Mock provider
 
+v3 on the mock: dev 3/8, holdout 1/4. Its JSON is always bare, but it inherits v1's naive urgency rule, because the mock only uses better urgency when the prompt contains "urgency guidelines". That is a property of the mock's keyword rules, so it says nothing about the ablation; only a live run can answer that.
+
 `npm run eval -- --provider mock --split holdout`: v1 0/4 (code fence, plus wrong urgency on T11 and T12 and a wrong category on T10); v2 4/4. Dev: v1 0/8, v2 8/8. These figures only show that the pipeline and explanations work; the mock's rules were written alongside v2.
 
 ### Claude API (not yet run)
@@ -173,7 +185,7 @@ npm run eval -- --provider anthropic --split holdout --versions 1,2 --json docs/
 npm run eval -- --provider anthropic --split dev --versions 1,2 --repeat 3 --json docs/eval/claude-dev.json
 ```
 
-The second command repeats each case three times to measure consistency, which the Gemini free tier could not afford. Report the Claude results here next to the Gemini ones, including any failures.
+The second command repeats each case three times to measure consistency, which the Gemini free tier could not afford. With `--repeat` above 1, the CLI ends with a consistency report: per prompt version, the passes out of evaluated repetitions, and each case whose outcome or predicted labels changed between repetitions. Errors and cancellations are not counted as evaluated. The same report is saved under `consistency` in the `--json` file. Report the Claude results here next to the Gemini ones, including any failures.
 
 ## Browser check (Chrome, 1440×900 and narrow)
 
@@ -202,7 +214,7 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 
 ## Testing
 
-`npm test` runs 72 tests in two Vitest projects. None needs an API key, and CI (`.github/workflows/ci.yml`) runs type checking, lint, tests and the build with no credentials.
+`npm test` runs 94 tests in two Vitest projects. None needs an API key, and CI (`.github/workflows/ci.yml`) runs type checking, lint, tests and the build with no credentials.
 
 - **Evaluators** (`server/evaluate/*.test.ts`): each check on its own, with exact explanation strings.
 - **Runner policy** (`server/runner/executeCase.test.ts`): fake timers drive retries, backoff, `retry-after`, the 120 s cap and fail-fast beyond it, deadlines before and during output, interrupted output, unknown usage, progress saved before backoff, and cancellation during backoff. Timings are asserted to the millisecond.
@@ -228,7 +240,6 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 - **Claude results are pending** an Anthropic key; the commands are above.
 - **No variance measured.** Every live case ran once. Rerun with `--repeat 3` when quota allows.
 - **Small, synthetic fixtures.** A 4-case holdout cannot show statistically meaningful differences. A real evaluation needs more cases, including more ambiguous ones like T10.
-- **Untested prompt ablation.** The results suggest the format instruction, not the rubric, drives the pass rate. A v3 that keeps only the "bare JSON" instruction would test that.
-- A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server is meant to run on localhost only.
+- **Prompt ablation not yet run live.** The results suggest the format instruction, not the rubric, drives the pass rate. The seeded v3 (*Baseline + bare JSON only*: v1 plus v2's format sentence) tests that; run it with `npm run eval -- --provider anthropic --split holdout --versions 1,2,3`.
+- A single workspace, one active run, and cases in sequence, by design for this scope. No authentication: the server listens on `127.0.0.1` by default (`HOST` overrides it, with a warning at startup).
 - No cost estimates. Token counts are shown, but prices change and are not hard-coded.
-- Partial output is saved when a case finishes or before a retry wait, not continuously, so a server crash mid-stream loses that case's text (the run is still marked failed on restart).

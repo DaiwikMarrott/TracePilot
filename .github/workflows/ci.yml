@@ -1,16 +1,24 @@
 name: CI
 
 on:
+  # Every branch, so work on feature branches is checked before it reaches a PR.
   push:
-    branches: [main]
   pull_request:
+
+# A newer push to the same branch makes an in-progress run obsolete.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-latest
     # Runs entirely against the mock provider and MSW; no API key is configured or needed.
+    timeout-minutes: 15
     env:
       ANTHROPIC_API_KEY: ""
+      GEMINI_API_KEY: ""
+      GOOGLE_API_KEY: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

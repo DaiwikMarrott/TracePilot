@@ -58,6 +58,15 @@ export function RunDetails({ id }: { id: string }) {
         <SummaryCounts summary={run.summary} />
         {run.statusReason && <span className="muted">{run.statusReason}</span>}
       </div>
+      <p className="row">
+        <span className="muted">Download this run:</span>
+        <a href={api.exportUrl(run.id, "json")} download>
+          JSON (full record)
+        </a>
+        <a href={api.exportUrl(run.id, "csv")} download>
+          CSV (one row per case)
+        </a>
+      </p>
 
       <div className="compare-grid">
         <div className="stack">

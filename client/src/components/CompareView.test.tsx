@@ -94,4 +94,24 @@ describe("CompareView", () => {
     expect(screen.queryByRole("heading", { name: /T1 · Subject T1/ })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /T2 · Subject T2/ })).toBeInTheDocument();
   });
+
+  it("compares latency and usage over completed cases, without inventing changes from unknown values", async () => {
+    const withTelemetry = (r: CaseResult, t: Partial<CaseResult["telemetry"]>): CaseResult => ({ ...r, telemetry: { ...r.telemetry, ...t } });
+    mockRuns(
+      run("a", 1, [
+        withTelemetry(result("a", 0, "T1", "completed", false), { ttftMs: 1000, durationMs: 1200, inputTokens: 100, outputTokens: 20 }),
+        withTelemetry(result("a", 1, "T2", "completed", true), { ttftMs: 2000, durationMs: 2200, inputTokens: 100, outputTokens: null }),
+      ]),
+      run("b", 2, [
+        withTelemetry(result("b", 0, "T1", "completed", true), { ttftMs: 500, durationMs: 600, inputTokens: 280, outputTokens: 18 }),
+        withTelemetry(result("b", 1, "T2", "completed", true), { ttftMs: 700, durationMs: 800, inputTokens: 280, outputTokens: 22 }),
+      ]),
+    );
+    render(<CompareView a="a" b="b" onOpenRun={() => {}} />);
+    const table = await screen.findByRole("table", { name: /Latency and usage over completed cases \(A: 2, B: 2\)/ });
+    const row = (name: string) => within(table).getByRole("rowheader", { name }).closest("tr")!;
+    expect(row("Median time to first text")).toHaveTextContent(/1\.50 s600 ms-60%/);
+    expect(row("Mean input tokens per case")).toHaveTextContent(/100280\+180%/);
+    expect(row("Mean output tokens per case")).toHaveTextContent(/20 \(1 unknown\)20—/);
+  });
 });

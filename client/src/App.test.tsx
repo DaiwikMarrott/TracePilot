@@ -31,7 +31,8 @@ class FakeEventSource {
   }
 }
 
-const versions: PromptVersion[] = SEED_PROMPTS.map((p, i) => ({
+// The first two seeds keep this workflow test independent of later ablation prompts.
+const versions: PromptVersion[] = SEED_PROMPTS.slice(0, 2).map((p, i) => ({
   ...p,
   id: i + 1,
   version: i + 1,

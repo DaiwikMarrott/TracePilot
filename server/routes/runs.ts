@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { TICKETS } from "../../fixtures/tickets";
 import type { Fixture, FixtureSelection, HealthResponse } from "../../shared/types";
+import { runToCsv } from "../export/csv";
 import { KEY_VARIABLE } from "../providers";
 import type { Repository } from "../db/repository";
 import type { RunManager } from "../runner/runManager";
@@ -22,6 +23,18 @@ export function runRoutes(repo: Repository, manager: RunManager, options: { prov
     const run = repo.getRunWithCases(req.params.id);
     if (!run) throw new HttpError(404, "Run not found");
     res.json(run);
+  });
+
+  // GET /api/runs/:id/export?format=json|csv — a download of the full record.
+  router.get("/:id/export", (req, res) => {
+    const run = repo.getRunWithCases(req.params.id);
+    if (!run) throw new HttpError(404, "Run not found");
+    const format = req.query.format ?? "json";
+    if (format !== "json" && format !== "csv") throw new HttpError(400, 'format must be "json" or "csv"');
+    const name = `tracepilot-v${run.promptSnapshot.version}-${run.id.slice(0, 8)}.${format}`;
+    res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+    if (format === "csv") res.type("text/csv; charset=utf-8").send(runToCsv(run));
+    else res.type("application/json").send(JSON.stringify(run, null, 2));
   });
 
   router.post("/", (req, res) => {

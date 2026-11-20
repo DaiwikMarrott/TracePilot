@@ -143,11 +143,25 @@ export class Repository {
     })();
   }
 
+  /**
+   * Adds any seed prompt not already present (matched on exact text), in order.
+   * A seed's parentId is the 1-based position of another seed, or null for the
+   * previous seed. Existing versions are never touched.
+   */
   seedPromptVersions(seeds: CreatePromptVersionRequest[]): void {
-    const { count } = this.db.prepare("SELECT COUNT(*) AS count FROM prompt_versions").get() as { count: number };
-    if (count > 0) return;
-    let parentId: number | null = null;
-    for (const seed of seeds) parentId = this.createPromptVersion({ ...seed, parentId }).id;
+    this.db.transaction(() => {
+      const find = this.db.prepare("SELECT id FROM prompt_versions WHERE system_prompt = ? AND user_template = ? ORDER BY version LIMIT 1");
+      const ids: number[] = [];
+      seeds.forEach((seed, i) => {
+        const existing = find.get(seed.systemPrompt, seed.userTemplate) as { id: number } | undefined;
+        if (existing) {
+          ids.push(existing.id);
+          return;
+        }
+        const parentId = seed.parentId !== null ? (ids[seed.parentId - 1] ?? null) : i > 0 ? ids[i - 1]! : null;
+        ids.push(this.createPromptVersion({ ...seed, parentId }).id);
+      });
+    })();
   }
 
   // ---- runs ----
@@ -277,10 +291,23 @@ export class Repository {
         runner_pid: number | null;
       }[];
       const abandoned = running.filter((r) => r.runner_pid === null || r.runner_pid === this.pid || !this.isAlive(r.runner_pid));
+      const lostCase = JSON.stringify({ kind: "unknown", message: "Server stopped while this case was running" });
+      const interruptedCase = JSON.stringify({
+        kind: "stream_interrupted",
+        message: "Server stopped while this case was streaming; output saved up to that point is kept",
+      });
       for (const { id } of abandoned) {
         this.db
           .prepare("UPDATE runs SET status = 'failed', status_reason = ?, finished_at = ? WHERE id = ?")
           .run("Server stopped before the run finished", now, id);
+        // The case that was executing has partial output saved while it streamed; label it like any other interruption.
+        this.db
+          .prepare(
+            `UPDATE case_results SET status = 'failed', interrupted = (output <> ''),
+               error = CASE WHEN output <> '' THEN ? ELSE ? END, finished_at = ?
+             WHERE run_id = ? AND status = 'running'`,
+          )
+          .run(interruptedCase, lostCase, now, id);
       }
       return abandoned.length;
     })();
