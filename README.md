@@ -89,6 +89,8 @@ docs/media/        demo recordings
 
 **Comparison telemetry.** The compare view puts both runs' median time to first text, median case duration, and mean input and output tokens per case side by side. Only completed cases count, because failed and cancelled cases have truncated timings that would flatter a run. Means are per case, so runs with different numbers of completed cases stay comparable. A relative change is shown only when both runs reported every value; otherwise the cell shows a dash instead of a number built on unknowns.
 
+**History filters.** Run history can be filtered by prompt version, provider and status. Each filter offers only values that occur in the history. A run selected for comparison stays selected when a filter hides it, and the selection count says how many are hidden.
+
 **State.** Runs move `queued → running → completed | failed | cancelled`. Cases move `queued → running → completed | failed | cancelled`. A case that never started stays `queued` and is shown as **unfinished**. The interface groups cases into five buckets — passed, failed checks, error, cancelled, unfinished — so an incomplete evaluation never looks like a clean result.
 
 **Several processes, one database.** The API server and the CLI can share the same SQLite file. Each running run records the PID of the process executing it. On startup, the server marks a run failed only if that process no longer exists, so restarting the server never mislabels a CLI run that is still going. Queued runs stay queued, because they can still be started.
@@ -212,7 +214,7 @@ Not yet checked: a screen-reader pass, and the light colour scheme in the browse
 
 ## Testing
 
-`npm test` runs 72 tests in two Vitest projects. None needs an API key, and CI (`.github/workflows/ci.yml`) runs type checking, lint, tests and the build with no credentials.
+`npm test` runs 94 tests in two Vitest projects. None needs an API key, and CI (`.github/workflows/ci.yml`) runs type checking, lint, tests and the build with no credentials.
 
 - **Evaluators** (`server/evaluate/*.test.ts`): each check on its own, with exact explanation strings.
 - **Runner policy** (`server/runner/executeCase.test.ts`): fake timers drive retries, backoff, `retry-after`, the 120 s cap and fail-fast beyond it, deadlines before and during output, interrupted output, unknown usage, progress saved before backoff, and cancellation during backoff. Timings are asserted to the millisecond.
