@@ -183,7 +183,7 @@ npm run eval -- --provider anthropic --split holdout --versions 1,2 --json docs/
 npm run eval -- --provider anthropic --split dev --versions 1,2 --repeat 3 --json docs/eval/claude-dev.json
 ```
 
-The second command repeats each case three times to measure consistency, which the Gemini free tier could not afford. Report the Claude results here next to the Gemini ones, including any failures.
+The second command repeats each case three times to measure consistency, which the Gemini free tier could not afford. With `--repeat` above 1, the CLI ends with a consistency report: per prompt version, the passes out of evaluated repetitions, and each case whose outcome or predicted labels changed between repetitions. Errors and cancellations are not counted as evaluated. The same report is saved under `consistency` in the `--json` file. Report the Claude results here next to the Gemini ones, including any failures.
 
 ## Browser check (Chrome, 1440×900 and narrow)
 

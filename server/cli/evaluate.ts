@@ -12,6 +12,7 @@ import { caseOutcome } from "../../shared/summary";
 import type { Effort, FixtureSelection, ProviderName, RunWithCases } from "../../shared/types";
 import { loadConfig } from "../config";
 import { openDatabase } from "../db/database";
+import { consistencyReport, formatConsistency } from "../evaluate/consistency";
 import { Repository } from "../db/repository";
 import { buildProviders, KEY_VARIABLE } from "../providers";
 import { selectFixtures } from "../routes/runs";
@@ -62,7 +63,9 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 }
 // Rewritten after every run so a partial evaluation still leaves a report.
 const writeReport = () => {
-  if (values.json) writeFileSync(values.json, JSON.stringify({ provider, settings, selection, repeat, runs }, null, 2));
+  if (!values.json) return;
+  const consistency = repeat > 1 ? consistencyReport(runs) : undefined;
+  writeFileSync(values.json, JSON.stringify({ provider, settings, selection, repeat, consistency, runs }, null, 2));
 };
 
 const ms = (v: number | null) => (v === null ? "?" : `${Math.round(v)} ms`);
@@ -98,4 +101,7 @@ for (const version of values.versions.split(",").map(Number)) {
   }
 }
 
+if (repeat > 1 && runs.length > 0) {
+  console.log(`\nConsistency across repetitions\n${formatConsistency(consistencyReport(runs))}`);
+}
 if (values.json) console.log(`\nWrote ${runs.length} run(s) to ${values.json}`);
